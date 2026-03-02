@@ -5,22 +5,22 @@
 
 @layer base {
   :root {
-    --background: 218 55% 10%;
+    --background: 218 55% 5%;
     --foreground: 45 100% 96%;
 
-    --card: 218 50% 15%;
+    --card: 218 50% 10%;
     --card-foreground: 45 100% 96%;
 
-    --popover: 218 50% 15%;
+    --popover: 218 50% 10%;
     --popover-foreground: 45 100% 96%;
 
     --primary: 45 80% 52%;
-    --primary-foreground: 218 55% 10%;
+    --primary-foreground: 218 55% 5%;
 
     --secondary: 15 70% 55%;
     --secondary-foreground: 218 55% 10%;
 
-    --muted: 218 40% 20%;
+    --muted: 218 40% 15%;
     --muted-foreground: 215 15% 60%;
 
     --accent: 45 80% 52%;
@@ -29,19 +29,19 @@
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 218 40% 25%;
-    --input: 218 40% 25%;
+    --border: 218 40% 20%;
+    --input: 218 40% 20%;
     --ring: 45 80% 52%;
 
-    --radius: 0.5rem;
+    --radius: 1rem;
 
-    --sidebar-background: 218 50% 12%;
+    --sidebar-background: 218 50% 8%;
     --sidebar-foreground: 45 100% 96%;
     --sidebar-primary: 45 80% 52%;
-    --sidebar-primary-foreground: 218 50% 15%;
-    --sidebar-accent: 218 40% 20%;
+    --sidebar-primary-foreground: 218 50% 10%;
+    --sidebar-accent: 218 40% 15%;
     --sidebar-accent-foreground: 45 100% 96%;
-    --sidebar-border: 218 40% 25%;
+    --sidebar-border: 218 40% 20%;
     --sidebar-ring: 45 80% 52%;
   }
 }
@@ -52,20 +52,29 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
   }
 }
 
 @layer utilities {
   .text-gradient-gold {
-    @apply bg-clip-text text-transparent;
-    background-image: linear-gradient(135deg, hsl(45 80% 52%), hsl(45 70% 65%));
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-[#D4AF37] via-[#FFD700] to-[#B8860B];
   }
 
   .bg-navy-gradient {
-    background: linear-gradient(135deg, hsl(218 55% 10%), hsl(218 50% 15%), hsl(218 40% 22%));
+    background: radial-gradient(circle at top right, hsl(218 50% 15%), hsl(218 55% 5%));
   }
 
   .bg-overlay-dark {
-    background: linear-gradient(180deg, hsla(218, 55%, 10%, 0.85), hsla(218, 50%, 15%, 0.75));
+    background: linear-gradient(180deg, hsla(218, 55%, 5%, 0.4), hsla(218, 55%, 5%, 0.95));
+  }
+
+  @keyframes slow-zoom {
+    from { transform: scale(1); }
+    to { transform: scale(1.1); }
+  }
+
+  .animate-slow-zoom {
+    animation: slow-zoom 20s ease-in-out infinite alternate;
   }
 }
