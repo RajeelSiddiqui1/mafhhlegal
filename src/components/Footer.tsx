@@ -1,8 +1,17 @@
 
+'use client';
+
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Scale, Mail, Phone, MapPin } from "lucide-react";
 
 export function Footer() {
+  const [year, setYear] = useState<number | null>(null);
+
+  useEffect(() => {
+    setYear(new Date().getFullYear());
+  }, []);
+
   return (
     <footer className="w-full bg-muted/30 border-t border-border mt-auto">
       <div className="container mx-auto px-4 py-12">
@@ -60,7 +69,7 @@ export function Footer() {
         </div>
         
         <div className="mt-12 pt-8 border-t border-border text-center text-xs text-muted-foreground">
-          <p>&copy; {new Date().getFullYear()} MAFHH Paralegal Services Professional Corporation. All rights reserved.</p>
+          <p>&copy; {year || 2024} MAFHH Paralegal Services Professional Corporation. All rights reserved.</p>
         </div>
       </div>
     </footer>

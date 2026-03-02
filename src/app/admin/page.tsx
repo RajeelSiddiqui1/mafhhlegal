@@ -30,11 +30,13 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { FadeIn } from "@/components/FadeIn";
 import { useToast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
 
 export default function AdminDashboard() {
   const { toast } = useToast();
   const [appointments, setAppointments] = useState<any[]>([]);
   const [search, setSearch] = useState("");
+  const [mounted, setMounted] = useState(false);
 
   const mockUsers = [
     { id: 1, name: "John Doe", email: "john@example.com", cases: 2, joinDate: "2024-01-15" },
@@ -44,6 +46,7 @@ export default function AdminDashboard() {
   ];
 
   useEffect(() => {
+    setMounted(true);
     const saved = localStorage.getItem("mafhh_appointments");
     if (saved) {
       setAppointments(JSON.parse(saved));
@@ -74,6 +77,8 @@ export default function AdminDashboard() {
     apt.client.toLowerCase().includes(search.toLowerCase()) ||
     apt.service.toLowerCase().includes(search.toLowerCase())
   );
+
+  if (!mounted) return null;
 
   return (
     <div className="flex min-h-screen flex-col bg-background">

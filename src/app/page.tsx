@@ -1,3 +1,4 @@
+
 import Link from "next/link";
 import Image from "next/image";
 import { Scale, Home as HomeIcon, Car, Quote, ArrowRight, ShieldCheck, Clock, Users, CheckCircle2, ChevronDown } from "lucide-react";
@@ -48,8 +49,8 @@ const testimonials = [
 ];
 
 export default function Home() {
-  const heroImg = PlaceHolderImages.find(img => img.id === "hero-justice") || PlaceHolderImages[0];
-  const aboutImg = PlaceHolderImages.find(img => img.id === "office-legal") || PlaceHolderImages[1];
+  const heroImg = PlaceHolderImages.find(img => img.id === "hero-justice") || PlaceHolderImages[0] || { imageUrl: "https://picsum.photos/seed/mafhh1/1920/1080", description: "Lady Justice", imageHint: "lady justice" };
+  const aboutImg = PlaceHolderImages.find(img => img.id === "office-legal") || PlaceHolderImages[1] || { imageUrl: "https://picsum.photos/seed/mafhh2/800/600", description: "Law office", imageHint: "law office" };
 
   return (
     <div className="flex min-h-screen flex-col bg-background selection:bg-primary/30">

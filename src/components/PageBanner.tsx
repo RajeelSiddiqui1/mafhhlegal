@@ -11,7 +11,7 @@ interface PageBannerProps {
 }
 
 export function PageBanner({ title, subtitle }: PageBannerProps) {
-  const heroImg = PlaceHolderImages.find(img => img.id === "hero-justice") || PlaceHolderImages[0];
+  const heroImg = PlaceHolderImages.find(img => img.id === "hero-justice") || PlaceHolderImages[0] || { imageUrl: "https://picsum.photos/seed/mafhh1/1920/1080", description: "Lady Justice", imageHint: "lady justice" };
 
   return (
     <section className="relative h-[40vh] md:h-[50vh] min-h-[350px] md:min-h-[450px] flex items-center justify-center overflow-hidden w-full">
