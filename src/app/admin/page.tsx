@@ -49,7 +49,12 @@ export default function AdminDashboard() {
     setMounted(true);
     const saved = localStorage.getItem("mafhh_appointments");
     if (saved) {
-      setAppointments(JSON.parse(saved));
+      try {
+        const parsed = JSON.parse(saved);
+        setAppointments(Array.isArray(parsed) ? parsed : []);
+      } catch (e) {
+        setAppointments([]);
+      }
     } else {
       const defaults = [
         { id: "APT-1001", client: "John Doe", service: "Small Claims Court", date: "2024-05-20", time: "10:30 AM", status: "Confirmed" },
@@ -73,10 +78,13 @@ export default function AdminDashboard() {
     });
   };
 
-  const filteredAppointments = appointments.filter(apt => 
-    apt.client.toLowerCase().includes(search.toLowerCase()) ||
-    apt.service.toLowerCase().includes(search.toLowerCase())
-  );
+  const filteredAppointments = appointments.filter(apt => {
+    const clientName = (apt?.client || "").toLowerCase();
+    const serviceName = (apt?.service || "").toLowerCase();
+    const searchTerm = search.toLowerCase();
+    
+    return clientName.includes(searchTerm) || serviceName.includes(searchTerm);
+  });
 
   if (!mounted) return null;
 
@@ -146,18 +154,18 @@ export default function AdminDashboard() {
             <TabsContent value="appointments" className="m-0">
               <div className="grid gap-4">
                 {filteredAppointments.map((apt, idx) => (
-                  <FadeIn key={apt.id} delay={idx * 0.05}>
+                  <FadeIn key={apt.id || idx} delay={idx * 0.05}>
                     <Card className="bg-card/20 border-white/5 hover:border-primary/20 transition-all rounded-2xl group">
                       <CardContent className="p-6">
                         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
                           <div className="flex items-center gap-4">
                             <div className="h-12 w-12 bg-muted/50 rounded-xl flex items-center justify-center font-bold text-primary border border-white/5">
-                              {apt.client.charAt(0)}
+                              {(apt?.client || "?").charAt(0)}
                             </div>
                             <div>
-                              <p className="text-[10px] font-bold text-primary uppercase tracking-widest">{apt.id}</p>
-                              <h3 className="text-lg font-headline font-bold">{apt.client}</h3>
-                              <p className="text-sm text-muted-foreground">{apt.service}</p>
+                              <p className="text-[10px] font-bold text-primary uppercase tracking-widest">{apt?.id || "N/A"}</p>
+                              <h3 className="text-lg font-headline font-bold">{apt?.client || "Unknown Client"}</h3>
+                              <p className="text-sm text-muted-foreground">{apt?.service || "Unspecified Service"}</p>
                             </div>
                           </div>
 
@@ -165,19 +173,19 @@ export default function AdminDashboard() {
                             <div className="hidden md:block">
                               <p className="text-[10px] uppercase font-bold text-muted-foreground mb-1">Schedule</p>
                               <div className="flex flex-col text-sm">
-                                <span className="flex items-center gap-2"><Calendar className="h-3 w-3" /> {apt.date}</span>
-                                <span className="flex items-center gap-2"><Clock className="h-3 w-3" /> {apt.time}</span>
+                                <span className="flex items-center gap-2"><Calendar className="h-3.5 w-3.5" /> {apt?.date || "TBD"}</span>
+                                <span className="flex items-center gap-2"><Clock className="h-3.5 w-3.5" /> {apt?.time || "TBD"}</span>
                               </div>
                             </div>
                             <div>
                               <p className="text-[10px] uppercase font-bold text-muted-foreground mb-1">Status</p>
                               <Badge variant="outline" className={cn(
                                 "border-none",
-                                apt.status === 'Confirmed' ? 'bg-green-500/10 text-green-500' : 
-                                apt.status === 'Cancelled' ? 'bg-red-500/10 text-red-500' : 
+                                apt?.status === 'Confirmed' ? 'bg-green-500/10 text-green-500' : 
+                                apt?.status === 'Cancelled' ? 'bg-red-500/10 text-red-500' : 
                                 'bg-yellow-500/10 text-yellow-500'
                               )}>
-                                {apt.status}
+                                {apt?.status || "Pending"}
                               </Badge>
                             </div>
                             <div className="flex justify-end">
