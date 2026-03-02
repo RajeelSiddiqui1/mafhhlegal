@@ -52,7 +52,20 @@ const aiLegalAssistantFlow = ai.defineFlow(
     outputSchema: AILegalAssistantOutputSchema,
   },
   async (input) => {
-    const {output} = await prompt(input);
-    return output!;
+    // Using generateStream for more efficient server-side processing
+    const {stream, response} = ai.generateStream({
+      prompt: prompt.renderText(input),
+      model: 'googleai/gemini-2.5-flash',
+    });
+
+    for await (const chunk of stream) {
+      // We could yield chunks here if we were using a different streaming architecture,
+      // but for this flow we'll return the final concatenated response.
+    }
+
+    const finalResponse = await response;
+    return {
+      answer: finalResponse.text,
+    };
   }
 );
