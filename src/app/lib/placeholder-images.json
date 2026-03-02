@@ -1,0 +1,23 @@
+
+{
+  "placeholderImages": [
+    {
+      "id": "hero-justice",
+      "description": "Lady Justice statue symbol of law",
+      "imageUrl": "https://picsum.photos/seed/mafhh1/1920/1080",
+      "imageHint": "lady justice"
+    },
+    {
+      "id": "office-legal",
+      "description": "Modern law office interior",
+      "imageUrl": "https://picsum.photos/seed/mafhh2/800/600",
+      "imageHint": "law office"
+    },
+    {
+      "id": "consultation",
+      "description": "Two people shaking hands in a legal setting",
+      "imageUrl": "https://picsum.photos/seed/mafhh3/800/600",
+      "imageHint": "legal consultation"
+    }
+  ]
+}

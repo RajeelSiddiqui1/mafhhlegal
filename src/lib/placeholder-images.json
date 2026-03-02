@@ -1,0 +1,22 @@
+{
+  "placeholderImages": [
+    {
+      "id": "hero-justice",
+      "description": "Lady Justice statue symbol of law",
+      "imageUrl": "https://images.unsplash.com/photo-1721352794721-9a2f91f8dcbd?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxsYWR5JTIwanVzdGljZXxlbnwwfHx8fDE3NzI0NzY4OTV8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "lady justice"
+    },
+    {
+      "id": "office-legal",
+      "description": "Modern law office interior",
+      "imageUrl": "https://images.unsplash.com/photo-1479142506502-19b3a3b7ff33?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxsYXclMjBvZmZpY2V8ZW58MHx8fHwxNzcyNDc2ODk1fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "law office"
+    },
+    {
+      "id": "consultation",
+      "description": "Two people shaking hands in a legal setting",
+      "imageUrl": "https://images.unsplash.com/photo-1767972463877-b64ba4283cd0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxsZWdhbCUyMGNvbnN1bHRhdGlvbnxlbnwwfHx8fDE3NzI0NzY4OTV8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "legal consultation"
+    }
+  ]
+}
