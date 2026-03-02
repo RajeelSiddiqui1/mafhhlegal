@@ -1,4 +1,3 @@
-
 import Link from "next/link";
 import Image from "next/image";
 import { Scale, Home as HomeIcon, Car, Quote, ArrowRight, ShieldCheck, Clock, Users, CheckCircle2, ChevronDown } from "lucide-react";
@@ -293,7 +292,7 @@ export default function Home() {
                   <Button asChild size="lg" variant="secondary" className="w-full sm:w-auto h-16 md:h-20 px-10 md:px-16 rounded-full font-bold text-lg md:text-2xl shadow-2xl hover:scale-105 transition-transform bg-background text-foreground hover:bg-background/90">
                     <Link href="/contact">Book Consultation</Link>
                   </Button>
-                  <Button asChild size="lg" variant="outline" className="w-full sm:w-auto h-16 md:h-20 px-10 md:px-16 rounded-full font-bold text-lg md:text-2xl border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground hover:text-primary transition-all">
+                  <Button asChild size="lg" variant="outline" className="w-full sm:w-auto h-16 md:h-20 px-10 md:px-16 rounded-full font-bold text-lg md:text-2xl border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground hover:text-primary hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-primary-foreground/20">
                     <Link href="tel:+16477075723">Call Now</Link>
                   </Button>
                 </div>
