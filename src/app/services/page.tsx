@@ -14,6 +14,7 @@ import { AIAssistant } from "@/components/AIAssistant";
 import { useToast } from "@/hooks/use-toast";
 import { categorizeInquiry, type InquiryCategorizerOutput } from "@/ai/flows/inquiry-categorizer-flow";
 import { cn } from "@/lib/utils";
+import { FadeIn } from "@/components/FadeIn";
 
 const servicesList = [
   {
@@ -115,11 +116,11 @@ export default function Services() {
         <section className="py-24">
           <div className="container mx-auto px-4 space-y-32">
             {servicesList.map((s, i) => (
-              <div key={s.id} id={s.id} className={cn(
+              <FadeIn key={s.id} direction={i % 2 === 1 ? "right" : "left"} className={cn(
                 "grid grid-cols-1 lg:grid-cols-2 gap-16 items-center",
                 i % 2 === 1 && "lg:flex-row-reverse"
               )}>
-                <div className={cn(i % 2 === 1 ? "lg:order-2" : "lg:order-1")}>
+                <div id={s.id} className={cn(i % 2 === 1 ? "lg:order-2" : "lg:order-1")}>
                   <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full mb-6 font-bold text-sm uppercase tracking-wider">
                     <s.icon className="h-4 w-4" />
                     Expert Representation
@@ -145,7 +146,7 @@ export default function Services() {
                   <s.icon className="w-48 h-48 text-primary/10 transition-transform duration-500 group-hover:scale-110" />
                   <div className="absolute inset-0 border-2 border-dashed border-primary/20 rounded-3xl m-4" />
                 </div>
-              </div>
+              </FadeIn>
             ))}
           </div>
         </section>
@@ -153,14 +154,14 @@ export default function Services() {
         {/* Appointment Form */}
         <section id="appointment" className="py-24 bg-muted/5 border-t border-border/50">
           <div className="container mx-auto px-4 max-w-5xl">
-            <div className="text-center mb-16">
+            <FadeIn className="text-center mb-16">
               <h2 className="text-3xl md:text-4xl font-headline font-bold mb-4">Book Your Consultation</h2>
               <div className="h-1 w-20 bg-primary mx-auto mb-6" />
               <p className="text-muted-foreground">Schedule a private session with our legal experts to discuss your matter.</p>
-            </div>
+            </FadeIn>
             
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-              <div className="lg:col-span-2">
+              <FadeIn direction="right" className="lg:col-span-2">
                 <form onSubmit={handleSubmit} className="bg-card rounded-2xl p-8 md:p-10 shadow-xl border border-border space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
@@ -244,9 +245,9 @@ export default function Services() {
                     {isSubmitting ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Processing...</> : "Request Consultation"}
                   </Button>
                 </form>
-              </div>
+              </FadeIn>
 
-              <div className="space-y-8">
+              <FadeIn direction="left" className="space-y-8">
                  <div className="bg-card rounded-2xl p-8 border border-border shadow-sm">
                     <Calendar className="h-10 w-10 text-primary mb-4" />
                     <h3 className="text-xl font-headline font-bold mb-4">Availability</h3>
@@ -270,7 +271,7 @@ export default function Services() {
                       ))}
                     </ul>
                  </div>
-              </div>
+              </FadeIn>
             </div>
           </div>
         </section>
