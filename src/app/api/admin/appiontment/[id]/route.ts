@@ -1,8 +1,10 @@
 import { authOptions } from "@/lib/auth"
 import dbConnect from "@/lib/db"
 import Appiontment from "@/model/Appiontment"
+import User from "@/model/User"
 import { getServerSession } from "next-auth"
 import { NextResponse } from "next/server"
+import { sendAppointmentStatusUpdateEmail } from "@/lib/email"
 
 export async function PATCH(req: Request, { params }: { params: { id: string } }) {
   try {
@@ -38,6 +40,28 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
         { message: "Appointment not found" },
         { status: 404 }
       )
+    }
+
+    // Get user details for email notification
+    const user = await User.findById(appointment.userId).lean();
+    
+    if (user) {
+      const userName = `${user.firstName} ${user.lastName}`;
+      
+      // Send email to the user who created the appointment
+      await sendAppointmentStatusUpdateEmail(
+        appointment.email,
+        userName,
+        status,
+        {
+          firstName: appointment.firstName,
+          lastName: appointment.lastName,
+          description: appointment.description,
+          preferredDate: appointment.preferredDate,
+          preferredTime: appointment.preferredTime,
+          area: appointment.area
+        }
+      );
     }
 
     return NextResponse.json(

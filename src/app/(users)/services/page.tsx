@@ -264,33 +264,33 @@ export default function Services() {
                 <form onSubmit={handleSubmit} className="bg-card/50 backdrop-blur-xl rounded-[2.5rem] p-8 md:p-12 shadow-2xl border border-white/10 space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
-                      <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground px-1">First Name *</label>
+                      <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground px-1">First Name (Optional)</label>
                       <Input 
-                        required 
                         className="bg-background/50 h-12" 
                         value={formData.firstName} 
                         onChange={(e) => setFormData({ ...formData, firstName: e.target.value })} 
+                        placeholder={session?.user?.name?.split(' ')[0] || "Auto-filled from login"}
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground px-1">Last Name *</label>
+                      <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground px-1">Last Name (Optional)</label>
                       <Input 
-                        required 
                         className="bg-background/50 h-12" 
                         value={formData.lastName} 
                         onChange={(e) => setFormData({ ...formData, lastName: e.target.value })} 
+                        placeholder={session?.user?.name?.split(' ').slice(1).join(' ') || "Auto-filled from login"}
                       />
                     </div>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
-                      <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground px-1">Email *</label>
+                      <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground px-1">Email (Optional)</label>
                       <Input 
                         type="email" 
-                        required 
                         className="bg-background/50 h-12" 
                         value={formData.email} 
                         onChange={(e) => setFormData({ ...formData, email: e.target.value })} 
+                        placeholder={session?.user?.email || "Auto-filled from login"}
                       />
                     </div>
                     <div className="space-y-2">

@@ -16,7 +16,8 @@ const appiontmentSchema = new Schema(
             type: String,
             required: true,
             lowercase: true,
-            trim: true
+            trim: true,
+            index: true
         },
         description: {
             type: String,

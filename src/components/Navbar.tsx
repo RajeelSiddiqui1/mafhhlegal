@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-=======
-
->>>>>>> 2535ef6d85c27a072bbe6e75ed60ba2f8ff344f2
 "use client";
 
 import Link from "next/link";
@@ -11,10 +7,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
-<<<<<<< HEAD
 import { useSession, signOut } from "next-auth/react";
-=======
->>>>>>> 2535ef6d85c27a072bbe6e75ed60ba2f8ff344f2
 
 const NavLinks = [
   { name: "Home", href: "/" },
@@ -26,47 +19,29 @@ const NavLinks = [
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-<<<<<<< HEAD
   const router = useRouter();
   
   // Get session data from NextAuth
   const { data: session, status } = useSession();
   const isLoggedIn = status === "authenticated";
   const isLoading = status === "loading";
-=======
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const router = useRouter();
->>>>>>> 2535ef6d85c27a072bbe6e75ed60ba2f8ff344f2
 
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 20);
     };
-<<<<<<< HEAD
-=======
     
-    const user = localStorage.getItem("mafhh_user");
-    setIsLoggedIn(!!user);
->>>>>>> 2535ef6d85c27a072bbe6e75ed60ba2f8ff344f2
-
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-<<<<<<< HEAD
   const handleLogout = async () => {
     await signOut({ redirect: false });
     setIsOpen(false);
-=======
-  const handleLogout = () => {
-    localStorage.removeItem("mafhh_user");
-    setIsLoggedIn(false);
->>>>>>> 2535ef6d85c27a072bbe6e75ed60ba2f8ff344f2
     router.push("/");
     router.refresh();
   };
 
-<<<<<<< HEAD
   // Show minimal navbar while loading
   if (isLoading) {
     return (
@@ -90,17 +65,11 @@ export function Navbar() {
     );
   }
 
-=======
->>>>>>> 2535ef6d85c27a072bbe6e75ed60ba2f8ff344f2
   return (
     <nav className={cn(
       "fixed top-0 z-50 w-full transition-all duration-500",
       scrolled 
-<<<<<<< HEAD
         ? "h-16 md:h-18 bg-background/30 backdrop-blur-md border-b border-white/10 py-0" 
-=======
-        ? "h-16 md:h-18 bg-background/80 backdrop-blur-xl border-b border-border/50 py-0" 
->>>>>>> 2535ef6d85c27a072bbe6e75ed60ba2f8ff344f2
         : "h-20 md:h-24 bg-transparent py-2"
     )}>
       <div className="container mx-auto flex h-full items-center justify-between px-4 md:px-6">
@@ -126,7 +95,6 @@ export function Navbar() {
             </Link>
           ))}
           
-<<<<<<< HEAD
           <div className="h-4 w-px bg-white/10 mx-2" />
 
           {isLoggedIn ? (
@@ -154,28 +122,12 @@ export function Navbar() {
                 size="sm" 
                 className="font-bold text-xs hover:text-red-400 bg-white/5 hover:bg-white/10 backdrop-blur-sm"
               >
-=======
-          <div className="h-4 w-px bg-border/50 mx-2" />
-
-          {isLoggedIn ? (
-            <div className="flex items-center gap-4">
-              <Link href="/admin" className="text-xs lg:text-sm font-bold text-primary flex items-center gap-2 hover:opacity-80 transition-opacity">
-                <ShieldCheck className="h-4 w-4" />
-                Admin
-              </Link>
-              <Link href="/dashboard" className="text-xs lg:text-sm font-bold text-foreground/70 flex items-center gap-2 hover:text-primary transition-colors">
-                <LayoutDashboard className="h-4 w-4" />
-                Dashboard
-              </Link>
-              <Button onClick={handleLogout} variant="ghost" size="sm" className="font-bold text-xs hover:text-red-400">
->>>>>>> 2535ef6d85c27a072bbe6e75ed60ba2f8ff344f2
                 <LogOut className="h-4 w-4 mr-2" />
                 Logout
               </Button>
             </div>
           ) : (
             <div className="flex items-center gap-3">
-<<<<<<< HEAD
               <Link 
                 href="/login" 
                 className="text-xs lg:text-sm font-bold text-foreground/70 hover:text-primary transition-colors"
@@ -187,12 +139,6 @@ export function Navbar() {
                 size="sm" 
                 className="font-bold rounded-full px-6 h-9 shadow-lg shadow-primary/20 hover:scale-105 transition-transform bg-primary/90 backdrop-blur-sm hover:bg-primary"
               >
-=======
-              <Link href="/login" className="text-xs lg:text-sm font-bold text-foreground/70 hover:text-primary transition-colors">
-                Login
-              </Link>
-              <Button asChild size="sm" className="font-bold rounded-full px-6 h-9 shadow-lg shadow-primary/20 hover:scale-105 transition-transform">
->>>>>>> 2535ef6d85c27a072bbe6e75ed60ba2f8ff344f2
                 <Link href="/register">Register</Link>
               </Button>
             </div>
@@ -201,11 +147,7 @@ export function Navbar() {
 
         {/* Mobile Nav Trigger */}
         <button
-<<<<<<< HEAD
           className="flex items-center md:hidden h-10 w-10 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10 flex items-center justify-center transition-colors hover:bg-white/10"
-=======
-          className="flex items-center md:hidden h-10 w-10 rounded-xl bg-card/50 backdrop-blur border border-border flex items-center justify-center transition-colors hover:bg-card"
->>>>>>> 2535ef6d85c27a072bbe6e75ed60ba2f8ff344f2
           onClick={() => setIsOpen(true)}
           aria-label="Open Menu"
         >
@@ -221,11 +163,7 @@ export function Navbar() {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: "100%" }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
-<<<<<<< HEAD
             className="fixed inset-0 z-[60] h-screen w-full bg-background/70 backdrop-blur-2xl flex flex-col p-6 md:hidden"
-=======
-            className="fixed inset-0 z-[60] h-screen w-full bg-background/98 backdrop-blur-2xl flex flex-col p-6 md:hidden"
->>>>>>> 2535ef6d85c27a072bbe6e75ed60ba2f8ff344f2
           >
             <div className="flex justify-between items-center mb-12">
               <Link href="/" className="flex items-center gap-2" onClick={() => setIsOpen(false)}>
@@ -234,11 +172,7 @@ export function Navbar() {
               </Link>
               <button 
                 onClick={() => setIsOpen(false)} 
-<<<<<<< HEAD
                 className="h-10 w-10 rounded-full bg-white/5 backdrop-blur-sm border border-white/10 flex items-center justify-center hover:bg-white/10 transition-colors"
-=======
-                className="h-10 w-10 rounded-full bg-card border border-border flex items-center justify-center hover:bg-muted transition-colors"
->>>>>>> 2535ef6d85c27a072bbe6e75ed60ba2f8ff344f2
                 aria-label="Close Menu"
               >
                 <X className="h-5 w-5" />
@@ -263,7 +197,6 @@ export function Navbar() {
                 </motion.div>
               ))}
               
-<<<<<<< HEAD
               <div className="h-px bg-white/10 my-4" />
 
               {isLoggedIn ? (
@@ -306,20 +239,6 @@ export function Navbar() {
                     className="w-full h-14 rounded-2xl text-lg font-bold shadow-xl shadow-primary/20 bg-primary/90 backdrop-blur-sm hover:bg-primary" 
                     onClick={() => setIsOpen(false)}
                   >
-=======
-              <div className="h-px bg-border my-4" />
-
-              {isLoggedIn ? (
-                <>
-                  <Link href="/admin" className="text-xl font-bold text-primary" onClick={() => setIsOpen(false)}>Admin Panel</Link>
-                  <Link href="/dashboard" className="text-xl font-bold text-foreground/70" onClick={() => setIsOpen(false)}>User Dashboard</Link>
-                  <button onClick={handleLogout} className="text-left text-xl font-bold text-foreground/70">Logout</button>
-                </>
-              ) : (
-                <>
-                  <Link href="/login" className="text-xl font-bold text-foreground/70" onClick={() => setIsOpen(false)}>Login</Link>
-                  <Button asChild className="w-full h-14 rounded-2xl text-lg font-bold shadow-xl shadow-primary/20" onClick={() => setIsOpen(false)}>
->>>>>>> 2535ef6d85c27a072bbe6e75ed60ba2f8ff344f2
                     <Link href="/register">Register Now</Link>
                   </Button>
                 </>
@@ -330,8 +249,4 @@ export function Navbar() {
       </AnimatePresence>
     </nav>
   );
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> 2535ef6d85c27a072bbe6e75ed60ba2f8ff344f2

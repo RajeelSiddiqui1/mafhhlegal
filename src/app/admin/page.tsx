@@ -458,22 +458,13 @@ export default function AdminDashboard() {
                 <Button 
                   variant="outline" 
                   size="sm"
-                  className="rounded-full border-white/10 hover:bg-primary/10"
+                  className="rounded-full border-white/10 hover:bg-primary/10 hover:text-white"
                   onClick={() => window.location.reload()}
                 >
                   <RefreshCw className="h-4 w-4 mr-2" />
                   Refresh
                 </Button>
-                <Button 
-                  variant="outline" 
-                  asChild 
-                  className="rounded-full border-white/10 hover:bg-primary/10"
-                >
-                  <a href="/dashboard">
-                    <LayoutDashboard className="h-4 w-4 mr-2" />
-                    User View
-                  </a>
-                </Button>
+               
               </div>
             </div>
           </FadeIn>
