@@ -276,23 +276,23 @@ export default function Home() {
 
         {/* CTA Section */}
         <section className="py-20 md:py-32 relative overflow-hidden">
-          <div className="container mx-auto px-4 max-w-4xl">
-            <FadeIn className="bg-white rounded-[2rem] md:rounded-[3.5rem] p-8 md:p-20 text-center relative overflow-hidden shadow-[0_32px_64px_-16px_rgba(0,0,0,0.4)]">
-              <div className="absolute top-0 right-0 p-12 md:p-16 opacity-[0.03] text-primary">
-                <Scale className="h-48 w-48 md:h-64 md:w-64 rotate-12" />
+          <div className="container mx-auto px-4 max-w-3xl">
+            <FadeIn className="bg-card/40 backdrop-blur-xl border border-white/10 rounded-[2rem] md:rounded-[2.5rem] p-8 md:p-12 lg:p-16 text-center relative overflow-hidden shadow-2xl">
+              <div className="absolute top-0 right-0 p-8 md:p-12 opacity-[0.05] text-primary pointer-events-none">
+                <Scale className="h-40 w-40 md:h-56 md:w-56 rotate-12" />
               </div>
               <div className="relative z-10">
-                <h2 className="text-3xl md:text-5xl lg:text-6xl font-headline font-bold text-slate-900 mb-6 md:mb-8 leading-tight">
+                <h2 className="text-3xl md:text-5xl lg:text-6xl font-headline font-bold text-foreground mb-6 md:mb-8 leading-tight">
                   Let's Discuss <br className="hidden sm:block" /> Your Case
                 </h2>
-                <p className="text-slate-600 mb-8 md:mb-12 max-w-xl mx-auto text-base md:text-lg lg:text-xl font-body leading-relaxed">
+                <p className="text-muted-foreground mb-8 md:mb-12 max-w-lg mx-auto text-base md:text-lg lg:text-xl font-body leading-relaxed">
                   The first step to resolution is a expert conversation. Get a professional assessment of your legal situation today.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 md:gap-6 justify-center items-center">
                   <Button asChild size="lg" className="w-full sm:w-auto h-14 md:h-16 px-10 md:px-12 rounded-full font-bold text-lg shadow-xl hover:scale-105 transition-transform bg-primary text-primary-foreground hover:bg-primary/90">
                     <Link href="/contact">Book Consultation</Link>
                   </Button>
-                  <Button asChild size="lg" variant="outline" className="w-full sm:w-auto h-14 md:h-16 px-10 md:px-12 rounded-full font-bold text-lg border-primary/20 text-primary hover:bg-primary/5 hover:scale-105 transition-all duration-300">
+                  <Button asChild size="lg" variant="outline" className="w-full sm:w-auto h-14 md:h-16 px-10 md:px-12 rounded-full font-bold text-lg border-primary/20 text-primary hover:bg-white/5 hover:scale-105 transition-all duration-300">
                     <Link href="tel:+16477075723">Call Now</Link>
                   </Button>
                 </div>
