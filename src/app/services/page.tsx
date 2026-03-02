@@ -58,6 +58,12 @@ const servicesList = [
   },
 ];
 
+const timeSlots = [
+  "9:00 AM", "9:30 AM", "10:00 AM", "10:30 AM", "11:00 AM", 
+  "11:30 AM", "12:00 PM", "12:30 PM", "1:00 PM", "1:30 PM", 
+  "2:00 PM", "2:30 PM", "3:00 PM", "3:30 PM", "4:00 PM", "4:30 PM"
+];
+
 export default function Services() {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -73,7 +79,6 @@ export default function Services() {
       const analysis = await categorizeInquiry({ message: msg });
       setAiAnalysis(analysis);
       if (analysis.suggestedCategories.length > 0) {
-        // Map AI categories to our select values
         const categoryMap: Record<string, string> = {
           "Small Claims Court": "small-claims",
           "Landlord & Tenant Disputes": "landlord-tenant",
@@ -91,7 +96,6 @@ export default function Services() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    // Simulate API call
     setTimeout(() => {
       toast({ 
         title: "Appointment Requested!", 
@@ -135,16 +139,16 @@ export default function Services() {
                       </li>
                     ))}
                   </ul>
-                  <Button asChild size="lg" className="font-bold">
+                  <Button asChild size="lg" className="font-bold rounded-full">
                     <a href="#appointment">Book Consultation</a>
                   </Button>
                 </div>
                 <div className={cn(
-                  "flex items-center justify-center p-12 bg-muted/10 rounded-3xl relative overflow-hidden group",
+                  "flex items-center justify-center p-12 bg-muted/10 rounded-3xl relative overflow-hidden group min-h-[400px]",
                   i % 2 === 1 ? "lg:order-1" : "lg:order-2"
                 )}>
                   <s.icon className="w-48 h-48 text-primary/10 transition-transform duration-500 group-hover:scale-110" />
-                  <div className="absolute inset-0 border-2 border-dashed border-primary/20 rounded-3xl m-4" />
+                  <div className="absolute inset-0 border-2 border-dashed border-primary/20 rounded-[2.5rem] m-6" />
                 </div>
               </FadeIn>
             ))}
@@ -162,49 +166,50 @@ export default function Services() {
             
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
               <FadeIn direction="right" className="lg:col-span-2">
-                <form onSubmit={handleSubmit} className="bg-card rounded-2xl p-8 md:p-10 shadow-xl border border-border space-y-6">
+                <form onSubmit={handleSubmit} className="bg-card/50 backdrop-blur-xl rounded-[2.5rem] p-8 md:p-12 shadow-2xl border border-white/10 space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
-                      <label className="text-sm font-bold text-foreground">First Name *</label>
-                      <Input required value={formData.firstName} onChange={(e) => setFormData({ ...formData, firstName: e.target.value })} />
+                      <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground px-1">First Name *</label>
+                      <Input required className="bg-background/50 h-12" value={formData.firstName} onChange={(e) => setFormData({ ...formData, firstName: e.target.value })} />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-sm font-bold text-foreground">Last Name *</label>
-                      <Input required value={formData.lastName} onChange={(e) => setFormData({ ...formData, lastName: e.target.value })} />
+                      <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground px-1">Last Name *</label>
+                      <Input required className="bg-background/50 h-12" value={formData.lastName} onChange={(e) => setFormData({ ...formData, lastName: e.target.value })} />
                     </div>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
-                      <label className="text-sm font-bold text-foreground">Email *</label>
-                      <Input type="email" required value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} />
+                      <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground px-1">Email *</label>
+                      <Input type="email" required className="bg-background/50 h-12" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-sm font-bold text-foreground">Phone *</label>
-                      <Input type="tel" required value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} />
+                      <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground px-1">Phone *</label>
+                      <Input type="tel" required className="bg-background/50 h-12" value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} />
                     </div>
                   </div>
                   
                   <div className="space-y-2">
-                    <label className="text-sm font-bold text-foreground">Description of Matter *</label>
+                    <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground px-1">Description of Matter *</label>
                     <Textarea 
                       required 
                       rows={4} 
+                      className="bg-background/50"
                       value={formData.description} 
                       onChange={(e) => setFormData({ ...formData, description: e.target.value })} 
                       onBlur={(e) => handleAIAnalysis(e.target.value)}
-                      placeholder="Please describe your legal situation. Our AI will help categorize it for you..." 
+                      placeholder="Please describe your legal situation..." 
                     />
                     {aiAnalysis && (
-                      <div className="mt-3 p-3 rounded-lg bg-primary/5 border border-primary/20 animate-in fade-in duration-300">
-                        <div className="flex items-center gap-2 mb-1">
+                      <div className="mt-4 p-4 rounded-2xl bg-primary/5 border border-primary/20 animate-in slide-in-from-top-2 duration-500">
+                        <div className="flex items-center gap-2 mb-2">
                           <MessageSquare className="h-4 w-4 text-primary" />
-                          <span className="text-xs font-bold uppercase tracking-wider text-primary">AI Analysis Results</span>
+                          <span className="text-[10px] font-bold uppercase tracking-widest text-primary">AI Analysis Results</span>
                         </div>
-                        <p className="text-xs text-muted-foreground">{aiAnalysis.reasoning}</p>
+                        <p className="text-xs text-muted-foreground italic leading-relaxed">{aiAnalysis.reasoning}</p>
                         {aiAnalysis.isUrgent && (
-                          <div className="mt-2 flex items-center gap-1 text-secondary">
-                            <AlertTriangle className="h-3 w-3" />
-                            <span className="text-[10px] font-bold uppercase">Urgent Matter Detected</span>
+                          <div className="mt-3 flex items-center gap-1.5 text-secondary">
+                            <AlertTriangle className="h-3.5 w-3.5" />
+                            <span className="text-[10px] font-bold uppercase tracking-widest">Urgent Matter Detected</span>
                           </div>
                         )}
                       </div>
@@ -213,9 +218,9 @@ export default function Services() {
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div className="space-y-2">
-                      <label className="text-sm font-bold text-foreground">Service Area *</label>
+                      <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground px-1">Service Area *</label>
                       <Select value={formData.service} onValueChange={(v) => setFormData({ ...formData, service: v })}>
-                        <SelectTrigger><SelectValue placeholder="Select a service" /></SelectTrigger>
+                        <SelectTrigger className="bg-background/50 h-12"><SelectValue placeholder="Select area" /></SelectTrigger>
                         <SelectContent>
                           <SelectItem value="small-claims">Small Claims Court</SelectItem>
                           <SelectItem value="landlord-tenant">Landlord & Tenant</SelectItem>
@@ -225,15 +230,15 @@ export default function Services() {
                       </Select>
                     </div>
                     <div className="space-y-2">
-                      <label className="text-sm font-bold text-foreground">Preferred Date *</label>
-                      <Input type="date" required value={formData.date} onChange={(e) => setFormData({ ...formData, date: e.target.value })} />
+                      <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground px-1">Preferred Date *</label>
+                      <Input type="date" required className="bg-background/50 h-12" value={formData.date} onChange={(e) => setFormData({ ...formData, date: e.target.value })} />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-sm font-bold text-foreground">Preferred Time *</label>
+                      <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground px-1">Preferred Time *</label>
                       <Select value={formData.time} onValueChange={(v) => setFormData({ ...formData, time: v })}>
-                        <SelectTrigger><SelectValue placeholder="Select time" /></SelectTrigger>
+                        <SelectTrigger className="bg-background/50 h-12"><SelectValue placeholder="Select time" /></SelectTrigger>
                         <SelectContent>
-                          {["9:00 AM", "10:00 AM", "11:00 AM", "12:00 PM", "1:00 PM", "2:00 PM", "3:00 PM", "4:00 PM"].map((t) => (
+                          {timeSlots.map((t) => (
                             <SelectItem key={t} value={t}>{t}</SelectItem>
                           ))}
                         </SelectContent>
@@ -241,31 +246,33 @@ export default function Services() {
                     </div>
                   </div>
 
-                  <Button type="submit" size="lg" className="w-full h-14 font-bold text-lg" disabled={isSubmitting}>
-                    {isSubmitting ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Processing...</> : "Request Consultation"}
+                  <Button type="submit" size="lg" className="w-full h-14 font-bold text-lg rounded-2xl shadow-xl shadow-primary/20 mt-4" disabled={isSubmitting}>
+                    {isSubmitting ? <><Loader2 className="mr-2 h-5 w-5 animate-spin" /> Processing...</> : "Request Consultation"}
                   </Button>
                 </form>
               </FadeIn>
 
               <FadeIn direction="left" className="space-y-8">
-                 <div className="bg-card rounded-2xl p-8 border border-border shadow-sm">
-                    <Calendar className="h-10 w-10 text-primary mb-4" />
-                    <h3 className="text-xl font-headline font-bold mb-4">Availability</h3>
+                 <div className="bg-card/30 backdrop-blur rounded-[2.5rem] p-10 border border-white/5 shadow-xl">
+                    <Calendar className="h-12 w-12 text-primary mb-6" />
+                    <h3 className="text-2xl font-headline font-bold mb-4">Availability</h3>
                     <p className="text-sm text-muted-foreground leading-relaxed">
-                      Consultations are by appointment only. We strive to respond to all booking requests within 24 business hours.
+                      Consultations are by appointment only. We are available Monday to Friday from <strong className="text-foreground">9:00 AM to 4:30 PM</strong>.
                     </p>
                  </div>
-                 <div className="bg-primary/5 rounded-2xl p-8 border border-primary/20">
-                    <h3 className="text-lg font-headline font-bold mb-4 text-primary">What to expect?</h3>
-                    <ul className="space-y-4">
+                 <div className="bg-primary/5 rounded-[2.5rem] p-10 border border-primary/20 shadow-xl">
+                    <h3 className="text-lg font-headline font-bold mb-6 text-primary">What to expect?</h3>
+                    <ul className="space-y-5">
                       {[
                         "Confidential evaluation",
                         "Strategic legal options",
                         "Clear fee structure",
                         "Actionable next steps"
                       ].map((item, idx) => (
-                        <li key={idx} className="flex items-center gap-3 text-sm font-medium">
-                          <CheckCircle className="h-4 w-4 text-primary" />
+                        <li key={idx} className="flex items-center gap-4 text-sm font-medium">
+                          <div className="h-6 w-6 rounded-full bg-primary/20 flex items-center justify-center shrink-0">
+                            <CheckCircle className="h-4 w-4 text-primary" />
+                          </div>
                           {item}
                         </li>
                       ))}

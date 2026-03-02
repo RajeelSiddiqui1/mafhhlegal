@@ -3,10 +3,11 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { Menu, X, Scale, ChevronRight } from "lucide-react";
+import { Menu, X, Scale, ChevronRight, User, LogOut, LayoutDashboard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
+import { useRouter } from "next/navigation";
 
 const NavLinks = [
   { name: "Home", href: "/" },
@@ -18,14 +19,28 @@ const NavLinks = [
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 20);
     };
+    
+    // Static auth check
+    const user = localStorage.getItem("mafhh_user");
+    setIsLoggedIn(!!user);
+
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("mafhh_user");
+    setIsLoggedIn(false);
+    router.push("/");
+    router.refresh();
+  };
 
   return (
     <nav className={cn(
@@ -45,7 +60,7 @@ export function Navbar() {
         </Link>
 
         {/* Desktop Nav */}
-        <div className="hidden md:flex md:items-center md:gap-8 lg:gap-10">
+        <div className="hidden md:flex md:items-center md:gap-6 lg:gap-8">
           {NavLinks.map((link) => (
             <Link
               key={link.name}
@@ -56,9 +71,30 @@ export function Navbar() {
               <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full" />
             </Link>
           ))}
-          <Button asChild size="sm" className="font-bold rounded-full px-6 lg:px-8 h-9 lg:h-10 shadow-lg shadow-primary/20 hover:scale-105 transition-transform">
-            <Link href="/services#appointment">Consultation</Link>
-          </Button>
+          
+          <div className="h-4 w-px bg-border/50 mx-2" />
+
+          {isLoggedIn ? (
+            <div className="flex items-center gap-4">
+              <Link href="/dashboard" className="text-xs lg:text-sm font-bold text-primary flex items-center gap-2 hover:opacity-80 transition-opacity">
+                <LayoutDashboard className="h-4 w-4" />
+                Dashboard
+              </Link>
+              <Button onClick={handleLogout} variant="ghost" size="sm" className="font-bold text-xs hover:text-red-400">
+                <LogOut className="h-4 w-4 mr-2" />
+                Logout
+              </Button>
+            </div>
+          ) : (
+            <div className="flex items-center gap-3">
+              <Link href="/login" className="text-xs lg:text-sm font-bold text-foreground/70 hover:text-primary transition-colors">
+                Login
+              </Link>
+              <Button asChild size="sm" className="font-bold rounded-full px-6 h-9 shadow-lg shadow-primary/20 hover:scale-105 transition-transform">
+                <Link href="/register">Register</Link>
+              </Button>
+            </div>
+          )}
         </div>
 
         {/* Mobile Nav Trigger */}
@@ -104,7 +140,7 @@ export function Navbar() {
                 >
                   <Link
                     href={link.href}
-                    className="flex items-center justify-between text-3xl font-headline font-bold text-foreground/90 hover:text-primary transition-colors group"
+                    className="flex items-center justify-between text-2xl font-headline font-bold text-foreground/90 hover:text-primary transition-colors group"
                     onClick={() => setIsOpen(false)}
                   >
                     {link.name}
@@ -112,19 +148,22 @@ export function Navbar() {
                   </Link>
                 </motion.div>
               ))}
-              <motion.div 
-                className="mt-8"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5 }}
-              >
-                <Button asChild className="w-full h-14 rounded-2xl text-lg font-bold shadow-xl shadow-primary/20" onClick={() => setIsOpen(false)}>
-                  <Link href="/services#appointment">Book Consultation</Link>
-                </Button>
-                <p className="text-center text-muted-foreground mt-6 text-xs font-medium italic">
-                  "Serving Ontario with Integrity"
-                </p>
-              </motion.div>
+              
+              <div className="h-px bg-border my-4" />
+
+              {isLoggedIn ? (
+                <>
+                  <Link href="/dashboard" className="text-xl font-bold text-primary" onClick={() => setIsOpen(false)}>Dashboard</Link>
+                  <button onClick={handleLogout} className="text-left text-xl font-bold text-foreground/70">Logout</button>
+                </>
+              ) : (
+                <>
+                  <Link href="/login" className="text-xl font-bold text-foreground/70" onClick={() => setIsOpen(false)}>Login</Link>
+                  <Button asChild className="w-full h-14 rounded-2xl text-lg font-bold shadow-xl shadow-primary/20" onClick={() => setIsOpen(false)}>
+                    <Link href="/register">Register Now</Link>
+                  </Button>
+                </>
+              )}
             </div>
           </motion.div>
         )}
