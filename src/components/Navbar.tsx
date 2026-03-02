@@ -3,7 +3,7 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { Menu, X, Scale, ChevronRight, User, LogOut, LayoutDashboard } from "lucide-react";
+import { Menu, X, Scale, ChevronRight, LogOut, LayoutDashboard, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
@@ -27,7 +27,6 @@ export function Navbar() {
       setScrolled(window.scrollY > 20);
     };
     
-    // Static auth check
     const user = localStorage.getItem("mafhh_user");
     setIsLoggedIn(!!user);
 
@@ -76,7 +75,11 @@ export function Navbar() {
 
           {isLoggedIn ? (
             <div className="flex items-center gap-4">
-              <Link href="/dashboard" className="text-xs lg:text-sm font-bold text-primary flex items-center gap-2 hover:opacity-80 transition-opacity">
+              <Link href="/admin" className="text-xs lg:text-sm font-bold text-primary flex items-center gap-2 hover:opacity-80 transition-opacity">
+                <ShieldCheck className="h-4 w-4" />
+                Admin
+              </Link>
+              <Link href="/dashboard" className="text-xs lg:text-sm font-bold text-foreground/70 flex items-center gap-2 hover:text-primary transition-colors">
                 <LayoutDashboard className="h-4 w-4" />
                 Dashboard
               </Link>
@@ -153,7 +156,8 @@ export function Navbar() {
 
               {isLoggedIn ? (
                 <>
-                  <Link href="/dashboard" className="text-xl font-bold text-primary" onClick={() => setIsOpen(false)}>Dashboard</Link>
+                  <Link href="/admin" className="text-xl font-bold text-primary" onClick={() => setIsOpen(false)}>Admin Panel</Link>
+                  <Link href="/dashboard" className="text-xl font-bold text-foreground/70" onClick={() => setIsOpen(false)}>User Dashboard</Link>
                   <button onClick={handleLogout} className="text-left text-xl font-bold text-foreground/70">Logout</button>
                 </>
               ) : (

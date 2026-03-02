@@ -2,18 +2,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { 
   LayoutDashboard, 
   Calendar, 
   Clock, 
-  MessageSquare, 
   Scale, 
   User, 
-  CheckCircle, 
-  AlertCircle, 
   ChevronRight,
-  Plus
+  Plus,
+  AlertCircle
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -25,37 +22,55 @@ import Link from "next/link";
 
 export default function DashboardPage() {
   const [user, setUser] = useState<{ name: string; email: string } | null>(null);
-  const router = useRouter();
+  const [appointments, setAppointments] = useState<any[]>([]);
 
   useEffect(() => {
+    // Mock user for demo if none exists
     const storedUser = localStorage.getItem("mafhh_user");
-    if (!storedUser) {
-      router.push("/login");
-    } else {
+    if (storedUser) {
       setUser(JSON.parse(storedUser));
+    } else {
+      setUser({ name: "Demo User", email: "demo@example.com" });
     }
-  }, [router]);
+
+    // Load appointments from local storage or use defaults
+    const saved = localStorage.getItem("mafhh_appointments");
+    if (saved) {
+      setAppointments(JSON.parse(saved));
+    } else {
+      const defaults = [
+        {
+          id: "APT-1001",
+          service: "Small Claims Court",
+          date: "2024-05-20",
+          time: "10:30 AM",
+          status: "Confirmed",
+          color: "bg-green-500/10 text-green-500",
+        },
+        {
+          id: "APT-1002",
+          service: "Landlord & Tenant",
+          date: "2024-05-25",
+          time: "2:00 PM",
+          status: "Pending",
+          color: "bg-yellow-500/10 text-yellow-500",
+        },
+      ];
+      setAppointments(defaults);
+      localStorage.setItem("mafhh_appointments", JSON.stringify(defaults));
+    }
+  }, []);
+
+  const getStatusColor = (status: string) => {
+    switch (status.toLowerCase()) {
+      case 'confirmed': return 'bg-green-500/10 text-green-500 border-green-500/20';
+      case 'pending': return 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20';
+      case 'cancelled': return 'bg-red-500/10 text-red-500 border-red-500/20';
+      default: return 'bg-muted text-muted-foreground';
+    }
+  };
 
   if (!user) return null;
-
-  const mockAppointments = [
-    {
-      id: "APT-001",
-      service: "Small Claims Court",
-      date: "2024-05-20",
-      time: "10:30 AM",
-      status: "Confirmed",
-      color: "bg-green-500/10 text-green-500",
-    },
-    {
-      id: "APT-002",
-      service: "Landlord & Tenant",
-      date: "2024-05-25",
-      time: "2:00 PM",
-      status: "Pending",
-      color: "bg-yellow-500/10 text-yellow-500",
-    },
-  ];
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -78,7 +93,6 @@ export default function DashboardPage() {
           </FadeIn>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Stats */}
             <div className="lg:col-span-1 space-y-6">
               <Card className="bg-card/50 backdrop-blur border-white/10 rounded-[2rem]">
                 <CardHeader>
@@ -101,7 +115,7 @@ export default function DashboardPage() {
               <Card className="bg-primary/5 border-primary/20 rounded-[2rem]">
                 <CardHeader>
                   <CardTitle className="text-lg font-headline font-bold flex items-center gap-2">
-                    <AlertCircle className="h-5 w-5 text-primary" /> Recent Updates
+                    <AlertCircle className="h-5 w-5 text-primary" /> Case Alert
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="text-sm text-muted-foreground space-y-3">
@@ -111,15 +125,16 @@ export default function DashboardPage() {
               </Card>
             </div>
 
-            {/* Appointments */}
             <div className="lg:col-span-2 space-y-8">
               <div className="flex items-center justify-between">
                 <h2 className="text-2xl font-headline font-bold">My Appointments</h2>
-                <Button variant="ghost" size="sm" className="font-bold text-primary">View History</Button>
+                <Link href="/admin" className="text-[10px] font-bold uppercase tracking-widest text-primary hover:underline">
+                  Switch to Admin View
+                </Link>
               </div>
 
               <div className="grid gap-6">
-                {mockAppointments.map((apt, idx) => (
+                {appointments.map((apt, idx) => (
                   <FadeIn key={apt.id} delay={idx * 0.1}>
                     <Card className="bg-card/30 border-white/5 hover:border-primary/30 transition-all rounded-[2rem] overflow-hidden group">
                       <CardContent className="p-8">
@@ -139,7 +154,7 @@ export default function DashboardPage() {
                           </div>
                           
                           <div className="flex items-center justify-between md:justify-end gap-6 w-full md:w-auto">
-                            <Badge className={apt.color}>{apt.status}</Badge>
+                            <Badge variant="outline" className={getStatusColor(apt.status)}>{apt.status}</Badge>
                             <Button variant="outline" size="icon" className="rounded-full h-10 w-10 border-white/10 group-hover:bg-primary group-hover:text-primary-foreground">
                               <ChevronRight className="h-4 w-4" />
                             </Button>
@@ -150,13 +165,10 @@ export default function DashboardPage() {
                   </FadeIn>
                 ))}
 
-                {mockAppointments.length === 0 && (
+                {appointments.length === 0 && (
                   <div className="text-center py-24 bg-card/10 rounded-[2rem] border-2 border-dashed border-white/5">
                     <Calendar className="h-12 w-12 text-muted-foreground mx-auto mb-4 opacity-20" />
                     <p className="text-muted-foreground italic">No upcoming appointments found.</p>
-                    <Button asChild variant="link" className="text-primary mt-2">
-                      <Link href="/services#appointment">Schedule one now</Link>
-                    </Button>
                   </div>
                 )}
               </div>
