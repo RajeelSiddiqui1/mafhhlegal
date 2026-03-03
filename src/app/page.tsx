@@ -57,7 +57,7 @@ export default function Home() {
       <Navbar />
       <main className="flex-1">
         {/* Hero Section */}
-        <section className="relative h-[90vh] md:h-screen w-full flex items-center justify-center overflow-hidden">
+        <section className="relative h-[90vh] md:h-screen w-full flex items-center justify-center overflow-hidden -mt-16 md:-mt-24">
           <div className="absolute inset-0 z-0">
             <Image
               src={heroImg.imageUrl}

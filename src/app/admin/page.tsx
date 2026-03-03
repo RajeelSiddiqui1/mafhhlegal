@@ -565,15 +565,17 @@ export default function AdminDashboard() {
           <FadeIn direction="down" className="mb-8">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
               <div className="flex items-center gap-4">
-                <div className="h-16 w-16 bg-gradient-to-br from-primary to-secondary rounded-2xl flex items-center justify-center shadow-xl shadow-primary/20">
+                <div className="h-16 w-16 bg-gradient-to-br from-primary to-secondary rounded-2xl flex items-center justify-center shadow-xl shadow-primary/20 group-hover:scale-105 transition-transform">
                   <ShieldCheck className="h-8 w-8 text-white" />
                 </div>
                 <div>
-                  <h1 className="text-3xl md:text-4xl font-headline font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                  <h1 className="text-3xl md:text-4xl font-headline font-bold bg-gradient-to-r from-primary via-yellow-400 to-secondary bg-clip-text text-transparent">
                     Admin Dashboard
                   </h1>
-                  <p className="text-muted-foreground text-sm mt-1">
-                    Welcome back, {session?.user?.name || 'Admin'} • {new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                  <p className="text-muted-foreground text-sm mt-1 flex items-center gap-2">
+                    <span>Welcome back, {session?.user?.name || 'Admin'}</span>
+                    <span className="text-primary">•</span>
+                    <span>{new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
                   </p>
                 </div>
               </div>
@@ -581,7 +583,7 @@ export default function AdminDashboard() {
                 <Button 
                   variant="outline" 
                   size="sm"
-                  className="rounded-full border-white/10 hover:bg-primary/10 hover:text-white"
+                  className="rounded-full border-white/10 hover:bg-primary/10 hover:text-white transition-all duration-300"
                   onClick={() => window.location.reload()}
                 >
                   <RefreshCw className="h-4 w-4 mr-2" />
@@ -594,28 +596,28 @@ export default function AdminDashboard() {
           {/* Stats Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             <FadeIn delay={0.1}>
-              <Card className="bg-gradient-to-br from-primary/10 to-transparent border-primary/20 backdrop-blur-sm rounded-2xl hover:shadow-xl transition-all duration-300 group">
+              <Card className="bg-gradient-to-br from-primary/10 to-transparent border-primary/20 backdrop-blur-sm rounded-2xl hover:shadow-2xl hover:shadow-primary/10 hover:border-primary/40 transition-all duration-300 group cursor-pointer">
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between mb-4">
-                    <div className="h-12 w-12 bg-primary/20 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <div className="h-12 w-12 bg-primary/20 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg">
                       <Users className="h-6 w-6 text-primary" />
                     </div>
                     <Badge variant="outline" className="bg-primary/10 border-primary/20">Total</Badge>
                   </div>
                   <p className="text-3xl font-headline font-bold mb-1">{totalUsers}</p>
                   <p className="text-xs text-muted-foreground uppercase tracking-wider">Registered Clients</p>
-                  <div className="mt-4 h-1 w-full bg-primary/10 rounded-full overflow-hidden">
-                    <div className="h-full w-3/4 bg-primary rounded-full" />
+                  <div className="mt-4 h-1.5 w-full bg-primary/10 rounded-full overflow-hidden">
+                    <div className="h-full w-3/4 bg-primary rounded-full transition-all duration-500" />
                   </div>
                 </CardContent>
               </Card>
             </FadeIn>
 
             <FadeIn delay={0.2}>
-              <Card className="bg-gradient-to-br from-green-500/10 to-transparent border-green-500/20 backdrop-blur-sm rounded-2xl hover:shadow-xl transition-all duration-300 group">
+              <Card className="bg-gradient-to-br from-green-500/10 to-transparent border-green-500/20 backdrop-blur-sm rounded-2xl hover:shadow-2xl hover:shadow-green-500/10 hover:border-green-500/40 transition-all duration-300 group cursor-pointer">
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between mb-4">
-                    <div className="h-12 w-12 bg-green-500/20 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <div className="h-12 w-12 bg-green-500/20 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg">
                       <Calendar className="h-6 w-6 text-green-500" />
                     </div>
                     <Badge variant="outline" className="bg-green-500/10 border-green-500/20">Active</Badge>
@@ -623,11 +625,11 @@ export default function AdminDashboard() {
                   <p className="text-3xl font-headline font-bold mb-1">{totalAppointments}</p>
                   <p className="text-xs text-muted-foreground uppercase tracking-wider">Total Appointments</p>
                   <div className="mt-4 flex gap-1">
-                    <div className="h-1 flex-1 bg-green-500/20 rounded-full overflow-hidden">
-                      <div className="h-full w-full bg-green-500 rounded-full" />
+                    <div className="h-1.5 flex-1 bg-green-500/20 rounded-full overflow-hidden">
+                      <div className="h-full w-full bg-green-500 rounded-full transition-all duration-500" />
                     </div>
-                    <div className="h-1 flex-1 bg-green-500/20 rounded-full overflow-hidden">
-                      <div className="h-full w-2/3 bg-green-500/50 rounded-full" />
+                    <div className="h-1.5 flex-1 bg-green-500/20 rounded-full overflow-hidden">
+                      <div className="h-full w-2/3 bg-green-500/50 rounded-full transition-all duration-500" />
                     </div>
                   </div>
                 </CardContent>
@@ -635,10 +637,10 @@ export default function AdminDashboard() {
             </FadeIn>
 
             <FadeIn delay={0.3}>
-              <Card className="bg-gradient-to-br from-yellow-500/10 to-transparent border-yellow-500/20 backdrop-blur-sm rounded-2xl hover:shadow-xl transition-all duration-300 group">
+              <Card className="bg-gradient-to-br from-yellow-500/10 to-transparent border-yellow-500/20 backdrop-blur-sm rounded-2xl hover:shadow-2xl hover:shadow-yellow-500/10 hover:border-yellow-500/40 transition-all duration-300 group cursor-pointer">
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between mb-4">
-                    <div className="h-12 w-12 bg-yellow-500/20 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <div className="h-12 w-12 bg-yellow-500/20 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg">
                       <MessageSquare className="h-6 w-6 text-yellow-500" />
                     </div>
                     <Badge variant="outline" className="bg-yellow-500/10 border-yellow-500/20">Inquiries</Badge>
@@ -656,10 +658,10 @@ export default function AdminDashboard() {
             </FadeIn>
 
             <FadeIn delay={0.4}>
-              <Card className="bg-gradient-to-br from-blue-500/10 to-transparent border-blue-500/20 backdrop-blur-sm rounded-2xl hover:shadow-xl transition-all duration-300 group">
+              <Card className="bg-gradient-to-br from-blue-500/10 to-transparent border-blue-500/20 backdrop-blur-sm rounded-2xl hover:shadow-2xl hover:shadow-blue-500/10 hover:border-blue-500/40 transition-all duration-300 group cursor-pointer">
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between mb-4">
-                    <div className="h-12 w-12 bg-blue-500/20 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <div className="h-12 w-12 bg-blue-500/20 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg">
                       <TrendingUp className="h-6 w-6 text-blue-500" />
                     </div>
                     <Badge variant="outline" className="bg-blue-500/10 border-blue-500/20">Rate</Badge>
@@ -669,8 +671,8 @@ export default function AdminDashboard() {
                   </p>
                   <p className="text-xs text-muted-foreground uppercase tracking-wider">Completion Rate</p>
                   <div className="mt-4 flex justify-between items-center text-xs">
-                    <span className="text-green-500">✓ {completedAppointments + completedContacts}</span>
-                    <span className="text-red-500">✗ {rejectedAppointments + rejectedContacts}</span>
+                    <span className="text-green-500 flex items-center gap-1"><CheckCircle2 className="h-3 w-3" /> {completedAppointments + completedContacts}</span>
+                    <span className="text-red-500 flex items-center gap-1"><XCircle className="h-3 w-3" /> {rejectedAppointments + rejectedContacts}</span>
                   </div>
                 </CardContent>
               </Card>
@@ -700,21 +702,43 @@ export default function AdminDashboard() {
                   </div>
                 </CardHeader>
                 <CardContent className="p-6">
-                  <div className="h-64">
+                  <div className="h-72">
                     <ResponsiveContainer width="100%" height="100%">
-                      <BarChart data={areaChartData}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" />
-                        <XAxis dataKey="name" stroke="#ffffff50" tick={{ fill: '#ffffff70', fontSize: 12 }} />
-                        <YAxis stroke="#ffffff50" tick={{ fill: '#ffffff70', fontSize: 12 }} />
+                      <BarChart data={areaChartData} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" vertical={false} />
+                        <XAxis 
+                          dataKey="name" 
+                          stroke="#ffffff50" 
+                          tick={{ fill: '#ffffff70', fontSize: 11 }} 
+                          axisLine={{ stroke: '#ffffff20' }}
+                          tickLine={false}
+                        />
+                        <YAxis 
+                          stroke="#ffffff50" 
+                          tick={{ fill: '#ffffff70', fontSize: 11 }} 
+                          axisLine={{ stroke: '#ffffff20' }}
+                          tickLine={false}
+                        />
                         <Tooltip 
                           contentStyle={{ 
-                            backgroundColor: '#1a1a1a', 
-                            border: '1px solid #ffffff20',
+                            backgroundColor: '#1f2937', 
+                            border: '1px solid #374151',
                             borderRadius: '12px',
-                            color: '#fff'
+                            color: '#f9fafb',
+                            padding: '12px 16px',
+                            boxShadow: '0 10px 25px rgba(0,0,0,0.3)'
                           }}
+                          itemStyle={{ color: '#f9fafb', fontWeight: 600 }}
+                          cursor={{ fill: '#ffffff10' }}
                         />
-                        <Bar dataKey="value" fill="#8B5CF6" radius={[4, 4, 0, 0]} />
+                        <Bar 
+                          dataKey="value" 
+                          fill="#8B5CF6" 
+                          radius={[6, 6, 0, 0]}
+                          animationBegin={0}
+                          animationDuration={800}
+                          maxBarSize={50}
+                        />
                       </BarChart>
                     </ResponsiveContainer>
                   </div>
@@ -731,39 +755,69 @@ export default function AdminDashboard() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="p-6">
-                  <div className="h-64">
+                  <div className="h-72 relative">
                     <ResponsiveContainer width="100%" height="100%">
                       <RePieChart>
                         <Pie
                           data={appointmentsByStatus}
                           cx="50%"
                           cy="50%"
-                          innerRadius={60}
-                          outerRadius={80}
+                          innerRadius={70}
+                          outerRadius={100}
                           paddingAngle={5}
                           dataKey="value"
+                          animationBegin={0}
+                          animationDuration={800}
+                          style={{ cursor: 'pointer' }}
                         >
                           {appointmentsByStatus.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={entry.color} />
+                            <Cell 
+                              key={`cell-${index}`} 
+                              fill={entry.color}
+                              stroke="transparent"
+                              style={{ 
+                                filter: 'drop-shadow(0 0 8px rgba(0,0,0,0.3))',
+                                transform: 'scale(1)',
+                                transformOrigin: 'center',
+                                transition: 'all 0.3s ease'
+                              }}
+                              className="transition-all duration-300 hover:opacity-80 hover:scale-105"
+                            />
                           ))}
                         </Pie>
                         <Tooltip 
                           contentStyle={{ 
-                            backgroundColor: '#1a1a1a', 
-                            border: '1px solid #ffffff20',
+                            backgroundColor: '#1f2937', 
+                            border: '1px solid #374151',
                             borderRadius: '12px',
-                            color: '#fff'
+                            color: '#f9fafb',
+                            padding: '12px 16px',
+                            boxShadow: '0 10px 25px rgba(0,0,0,0.3)'
                           }}
+                          itemStyle={{ color: '#f9fafb', fontWeight: 600 }}
+                          labelStyle={{ color: '#d1d5db', marginBottom: '4px' }}
+                          formatter={(value: number, name: string) => [
+                            `${value} ${name}`,
+                            name
+                          ]}
                         />
                       </RePieChart>
                     </ResponsiveContainer>
+                    {/* Center text */}
+                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center pointer-events-none">
+                      <p className="text-3xl font-bold text-foreground">{totalAppointments}</p>
+                      <p className="text-xs text-muted-foreground">Total</p>
+                    </div>
                   </div>
-                  <div className="grid grid-cols-2 gap-2 mt-4">
+                  <div className="grid grid-cols-2 gap-3 mt-4">
                     {appointmentsByStatus.map((item, idx) => (
-                      <div key={idx} className="flex items-center gap-2 text-xs">
-                        <div className="h-3 w-3 rounded-full" style={{ backgroundColor: item.color }} />
+                      <div 
+                        key={idx} 
+                        className="flex items-center gap-2 text-xs p-2 rounded-lg bg-muted/20 hover:bg-muted/40 transition-colors cursor-pointer"
+                      >
+                        <div className="h-3 w-3 rounded-full shadow-sm" style={{ backgroundColor: item.color }} />
                         <span className="text-muted-foreground">{item.name}:</span>
-                        <span className="font-bold">{item.value}</span>
+                        <span className="font-bold text-foreground">{item.value}</span>
                       </div>
                     ))}
                   </div>
@@ -775,20 +829,20 @@ export default function AdminDashboard() {
           {/* Tabs Section */}
           <Tabs defaultValue="appointments" className="space-y-8" onValueChange={setActiveTab}>
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-              <TabsList className="bg-card/50 border border-white/10 p-1 rounded-xl">
-                <TabsTrigger value="overview" className="rounded-lg px-4 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground font-bold">
+              <TabsList className="bg-card/50 border border-white/10 p-1 rounded-xl shadow-lg">
+                <TabsTrigger value="overview" className="rounded-lg px-4 py-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground font-semibold transition-all duration-300 hover:bg-primary/20">
                   <Activity className="h-4 w-4 mr-2" />
                   Overview
                 </TabsTrigger>
-                <TabsTrigger value="appointments" className="rounded-lg px-4 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground font-bold">
+                <TabsTrigger value="appointments" className="rounded-lg px-4 py-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground font-semibold transition-all duration-300 hover:bg-primary/20">
                   <Calendar className="h-4 w-4 mr-2" />
                   Appointments ({filteredAppointments.length})
                 </TabsTrigger>
-                <TabsTrigger value="contacts" className="rounded-lg px-4 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground font-bold">
+                <TabsTrigger value="contacts" className="rounded-lg px-4 py-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground font-semibold transition-all duration-300 hover:bg-primary/20">
                   <MessageSquare className="h-4 w-4 mr-2" />
                   Contacts ({filteredContacts.length})
                 </TabsTrigger>
-                <TabsTrigger value="users" className="rounded-lg px-4 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground font-bold">
+                <TabsTrigger value="users" className="rounded-lg px-4 py-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground font-semibold transition-all duration-300 hover:bg-primary/20">
                   <Users className="h-4 w-4 mr-2" />
                   Clients ({filteredUsers.length})
                 </TabsTrigger>
@@ -998,49 +1052,49 @@ export default function AdminDashboard() {
                                       )}
                                     </Button>
                                   </DropdownMenuTrigger>
-                                  <DropdownMenuContent align="end" className="bg-card border-white/10 rounded-xl w-48">
-                                    <DropdownMenuLabel>Update Status</DropdownMenuLabel>
-                                    <DropdownMenuSeparator />
+                                  <DropdownMenuContent align="end" className="bg-card border-white/10 rounded-xl w-52 shadow-2xl shadow-black/20">
+                                    <DropdownMenuLabel className="text-muted-foreground">Update Status</DropdownMenuLabel>
+                                    <DropdownMenuSeparator className="bg-white/10" />
                                     <DropdownMenuItem 
                                       onClick={(e) => {
                                         e.stopPropagation();
                                         updateAppointmentStatus(apt._id, 'Progress');
                                       }}
-                                      className="flex items-center gap-2 cursor-pointer"
+                                      className="flex items-center gap-3 cursor-pointer rounded-lg mx-1 my-0.5 p-2 hover:bg-blue-500/20 focus:bg-blue-500/20 transition-colors"
                                     >
                                       <Timer className="h-4 w-4 text-blue-500" />
-                                      In Progress
+                                      <span className="text-blue-400 font-medium">In Progress</span>
                                     </DropdownMenuItem>
                                     <DropdownMenuItem 
                                       onClick={(e) => {
                                         e.stopPropagation();
                                         updateAppointmentStatus(apt._id, 'Completed');
                                       }}
-                                      className="flex items-center gap-2 cursor-pointer"
+                                      className="flex items-center gap-3 cursor-pointer rounded-lg mx-1 my-0.5 p-2 hover:bg-green-500/20 focus:bg-green-500/20 transition-colors"
                                     >
                                       <CheckCircle2 className="h-4 w-4 text-green-500" />
-                                      Completed
+                                      <span className="text-green-400 font-medium">Completed</span>
                                     </DropdownMenuItem>
                                     <DropdownMenuItem 
                                       onClick={(e) => {
                                         e.stopPropagation();
                                         updateAppointmentStatus(apt._id, 'Rejected');
                                       }}
-                                      className="flex items-center gap-2 cursor-pointer text-red-500"
+                                      className="flex items-center gap-3 cursor-pointer rounded-lg mx-1 my-0.5 p-2 hover:bg-red-500/20 focus:bg-red-500/20 transition-colors"
                                     >
-                                      <XCircle className="h-4 w-4" />
-                                      Rejected
+                                      <XCircle className="h-4 w-4 text-red-500" />
+                                      <span className="text-red-400 font-medium">Rejected</span>
                                     </DropdownMenuItem>
-                                    <DropdownMenuSeparator />
+                                    <DropdownMenuSeparator className="bg-white/10" />
                                     <DropdownMenuItem 
                                       onClick={(e) => {
                                         e.stopPropagation();
                                         window.location.href = `mailto:${apt.email}`;
                                       }}
-                                      className="flex items-center gap-2 cursor-pointer"
+                                      className="flex items-center gap-3 cursor-pointer rounded-lg mx-1 my-0.5 p-2 hover:bg-primary/20 focus:bg-primary/20 transition-colors"
                                     >
-                                      <Mail className="h-4 w-4" />
-                                      Email Client
+                                      <Mail className="h-4 w-4 text-primary" />
+                                      <span className="font-medium">Email Client</span>
                                     </DropdownMenuItem>
                                   </DropdownMenuContent>
                                 </DropdownMenu>
