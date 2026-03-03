@@ -109,13 +109,17 @@ export function Navbar() {
                   Admin
                 </Link>
               )}
-              <Link 
-                href="/dashboard" 
-                className="text-xs lg:text-sm font-bold text-foreground/70 flex items-center gap-2 hover:text-primary transition-colors"
-              >
-                <LayoutDashboard className="h-4 w-4" />
-                Dashboard
-              </Link>
+              
+              {/* Show Dashboard link only for non-admin users */}
+              {session?.user?.role !== "Admin" && (
+                <Link 
+                  href="/dashboard" 
+                  className="text-xs lg:text-sm font-bold text-foreground/70 flex items-center gap-2 hover:text-primary transition-colors"
+                >
+                  <LayoutDashboard className="h-4 w-4" />
+                  Dashboard
+                </Link>
+              )}
               <Button 
                 onClick={handleLogout} 
                 variant="ghost" 
@@ -211,13 +215,16 @@ export function Navbar() {
                       Admin Panel
                     </Link>
                   )}
-                  <Link 
-                    href="/dashboard" 
-                    className="text-xl font-bold text-foreground/70" 
-                    onClick={() => setIsOpen(false)}
-                  >
-                    User Dashboard
-                  </Link>
+                  {/* Show Dashboard link only for non-admin users */}
+                  {session?.user?.role !== "Admin" && (
+                    <Link 
+                      href="/dashboard" 
+                      className="text-xl font-bold text-foreground/70" 
+                      onClick={() => setIsOpen(false)}
+                    >
+                      User Dashboard
+                    </Link>
+                  )}
                   <button 
                     onClick={handleLogout} 
                     className="text-left text-xl font-bold text-foreground/70 hover:text-red-400 transition-colors"
