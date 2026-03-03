@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from "react";
@@ -11,6 +10,9 @@ import { Footer } from "@/components/Footer";
 import { PageBanner } from "@/components/PageBanner";
 import { AIAssistant } from "@/components/AIAssistant";
 import { useToast } from "@/hooks/use-toast";
+import axios from "axios";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 const contactMethods = [
   {
@@ -38,22 +40,86 @@ const contactMethods = [
 
 export default function Contact() {
   const { toast } = useToast();
+  const { data: session, status } = useSession();
+  const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
-    firstName: "", lastName: "", email: "", phone: "", subject: "", message: "",
+    firstName: "", 
+    lastName: "", 
+    email: "", 
+    phone: "", 
+    subject: "", 
+    Inquiry: "", // Note: Changed from 'message' to 'Inquiry' to match schema
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
-    setTimeout(() => {
+    
+    // Check if user is logged in
+    if (status !== "authenticated" || session?.user?.role !== "User") {
       toast({ 
-        title: "Message Sent!", 
-        description: "Thank you for contacting Mafhh Legal. We will respond as soon as possible." 
+        title: "Authentication Required", 
+        description: "Please login as a user to send a message.",
+        variant: "destructive"
       });
-      setFormData({ firstName: "", lastName: "", email: "", phone: "", subject: "", message: "" });
+      router.push("/login");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const response = await axios.post('/api/contact', {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        phone: formData.phone,
+        subject: formData.subject,
+        Inquiry: formData.Inquiry,
+      });
+
+      if (response.status === 201) {
+        toast({ 
+          title: "Message Sent!", 
+          description: response.data.message || "Thank you for contacting Mafhh Legal. We will respond as soon as possible." 
+        });
+        
+        // Reset form
+        setFormData({ 
+          firstName: "", 
+          lastName: "", 
+          email: "", 
+          phone: "", 
+          subject: "", 
+          Inquiry: "" 
+        });
+      }
+    } catch (error: any) {
+      console.error("Contact submission error:", error);
+      
+      if (error.response?.status === 400) {
+        toast({ 
+          title: "Validation Error", 
+          description: error.response.data.message || "Please fill in all required fields.",
+          variant: "destructive"
+        });
+      } else if (error.response?.status === 401 || error.response?.status === 400) {
+        toast({ 
+          title: "Access Denied", 
+          description: "Please login as a user to send a message.",
+          variant: "destructive"
+        });
+        router.push("/login");
+      } else {
+        toast({ 
+          title: "Error", 
+          description: "Failed to send message. Please try again later.",
+          variant: "destructive"
+        });
+      }
+    } finally {
       setIsSubmitting(false);
-    }, 1500);
+    }
   };
 
   return (
@@ -76,33 +142,77 @@ export default function Contact() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
                       <label className="text-sm font-bold text-foreground">First Name *</label>
-                      <Input required value={formData.firstName} onChange={(e) => setFormData({ ...formData, firstName: e.target.value })} className="bg-background/50" />
+                      <Input 
+                       
+                        value={formData.firstName} 
+                        onChange={(e) => setFormData({ ...formData, firstName: e.target.value })} 
+                        className="bg-background/50" 
+                        disabled={isSubmitting}
+                      />
                     </div>
                     <div className="space-y-2">
                       <label className="text-sm font-bold text-foreground">Last Name *</label>
-                      <Input required value={formData.lastName} onChange={(e) => setFormData({ ...formData, lastName: e.target.value })} className="bg-background/50" />
+                      <Input 
+                   
+                        value={formData.lastName} 
+                        onChange={(e) => setFormData({ ...formData, lastName: e.target.value })} 
+                        className="bg-background/50"
+                        disabled={isSubmitting}
+                      />
                     </div>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
                       <label className="text-sm font-bold text-foreground">Email Address *</label>
-                      <Input type="email" required value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} className="bg-background/50" />
+                      <Input 
+                        type="email" 
+                      
+                        value={formData.email} 
+                        onChange={(e) => setFormData({ ...formData, email: e.target.value })} 
+                        className="bg-background/50"
+                        disabled={isSubmitting}
+                      />
                     </div>
                     <div className="space-y-2">
                       <label className="text-sm font-bold text-foreground">Phone Number *</label>
-                      <Input type="tel" required value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} className="bg-background/50" />
+                      <Input 
+                        type="tel" 
+                        required 
+                        value={formData.phone} 
+                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })} 
+                        className="bg-background/50"
+                        disabled={isSubmitting}
+                      />
                     </div>
                   </div>
                   <div className="space-y-2">
                     <label className="text-sm font-bold text-foreground">Subject *</label>
-                    <Input required value={formData.subject} onChange={(e) => setFormData({ ...formData, subject: e.target.value })} className="bg-background/50" />
+                    <Input 
+                      required 
+                      value={formData.subject} 
+                      onChange={(e) => setFormData({ ...formData, subject: e.target.value })} 
+                      className="bg-background/50"
+                      disabled={isSubmitting}
+                    />
                   </div>
                   <div className="space-y-2">
                     <label className="text-sm font-bold text-foreground">Inquiry Details *</label>
-                    <Textarea required rows={6} value={formData.message} onChange={(e) => setFormData({ ...formData, message: e.target.value })} placeholder="How can we help you today?" className="bg-background/50" />
+                    <Textarea 
+                      required 
+                      rows={6} 
+                      value={formData.Inquiry} 
+                      onChange={(e) => setFormData({ ...formData, Inquiry: e.target.value })} 
+                      placeholder="How can we help you today?" 
+                      className="bg-background/50"
+                      disabled={isSubmitting}
+                    />
                   </div>
                   <Button type="submit" size="lg" className="w-full h-14 font-bold text-lg" disabled={isSubmitting}>
-                    {isSubmitting ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Sending...</> : <><Send className="mr-2 h-4 w-4" /> Send Message</>}
+                    {isSubmitting ? (
+                      <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Sending...</>
+                    ) : (
+                      <><Send className="mr-2 h-4 w-4" /> Send Message</>
+                    )}
                   </Button>
                 </form>
               </div>

@@ -1,4 +1,3 @@
-// app/admin/page.tsx
 "use client";
 
 import { useState, useEffect } from "react";
@@ -55,13 +54,17 @@ import {
   AlertTriangle,
   Info,
   ChevronDown,
-  Menu
+  Menu,
+  Inbox,
+  Send,
+  Reply
 } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
@@ -127,6 +130,24 @@ interface Appointment {
   };
 }
 
+interface Contact {
+  _id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  subject: string;
+  Inquiry: string;
+  status: "Pending" | "Progress" | "Rejected" | "Completed";
+  createdAt: string;
+  userId?: {
+    _id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+  };
+}
+
 interface User {
   _id: string;
   firstName: string;
@@ -142,6 +163,7 @@ export default function AdminDashboard() {
   const { toast } = useToast();
   
   const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [contacts, setContacts] = useState<Contact[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [search, setSearch] = useState("");
   const [mounted, setMounted] = useState(false);
@@ -151,8 +173,10 @@ export default function AdminDashboard() {
   
   // Modal states
   const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
+  const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isAppointmentModalOpen, setIsAppointmentModalOpen] = useState(false);
+  const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const [isUserModalOpen, setIsUserModalOpen] = useState(false);
   const [updatingStatus, setUpdatingStatus] = useState<string | null>(null);
   
@@ -181,7 +205,7 @@ export default function AdminDashboard() {
     }
   }, [session, status, router]);
 
-  // Fetch appointments
+  // Fetch all data
   useEffect(() => {
     const fetchData = async () => {
       if (!session?.user) return;
@@ -194,6 +218,12 @@ export default function AdminDashboard() {
         const appointmentsRes = await axios.get('/api/admin/appiontment');
         if (appointmentsRes.data && appointmentsRes.data.appiontments) {
           setAppointments(appointmentsRes.data.appiontments);
+        }
+        
+        // Fetch contacts
+        const contactsRes = await axios.get('/api/admin/contact');
+        if (contactsRes.data && contactsRes.data.contacts) {
+          setContacts(contactsRes.data.contacts);
         }
         
         // Fetch users
@@ -224,7 +254,47 @@ export default function AdminDashboard() {
     setMounted(true);
   }, []);
 
-  const updateStatus = async (id: string, newStatus: string) => {
+  // Update contact status
+  const updateContactStatus = async (id: string, newStatus: string) => {
+    try {
+      setUpdatingStatus(id);
+      
+      const response = await axios.patch(`/api/admin/contact/${id}`, {
+        status: newStatus
+      });
+      
+      if (response.status === 200) {
+        // Update local state
+        setContacts(prev => 
+          prev.map(contact => 
+            contact._id === id ? { ...contact, status: newStatus as any } : contact
+          )
+        );
+        
+        toast({
+          title: "Status Updated",
+          description: `Contact inquiry is now ${newStatus}.`,
+        });
+
+        // If modal is open, update selected contact
+        if (selectedContact?._id === id) {
+          setSelectedContact({ ...selectedContact, status: newStatus as any });
+        }
+      }
+    } catch (error: any) {
+      console.error("Error updating contact status:", error);
+      toast({
+        title: "Update Failed",
+        description: error.response?.data?.message || "Failed to update status",
+        variant: "destructive"
+      });
+    } finally {
+      setUpdatingStatus(null);
+    }
+  };
+
+  // Update appointment status
+  const updateAppointmentStatus = async (id: string, newStatus: string) => {
     try {
       setUpdatingStatus(id);
       
@@ -233,7 +303,6 @@ export default function AdminDashboard() {
       });
       
       if (response.status === 200) {
-        // Update local state
         setAppointments(prev => 
           prev.map(apt => 
             apt._id === id ? { ...apt, status: newStatus } : apt
@@ -244,6 +313,10 @@ export default function AdminDashboard() {
           title: "Status Updated",
           description: `Appointment is now ${newStatus}.`,
         });
+
+        if (selectedAppointment?._id === id) {
+          setSelectedAppointment({ ...selectedAppointment, status: newStatus });
+        }
       }
     } catch (error: any) {
       console.error("Error updating status:", error);
@@ -338,7 +411,6 @@ export default function AdminDashboard() {
   // Filter and sort appointments
   const filteredAppointments = appointments
     .filter(apt => {
-      // Search filter
       const fullName = `${apt.firstName} ${apt.lastName}`.toLowerCase();
       const creatorName = apt.userId ? `${apt.userId.firstName} ${apt.userId.lastName}`.toLowerCase() : '';
       const serviceName = apt.area.toLowerCase();
@@ -350,10 +422,8 @@ export default function AdminDashboard() {
                            serviceName.includes(searchTerm) || 
                            email.includes(searchTerm);
       
-      // Status filter
       const matchesStatus = statusFilter === "all" || apt.status.toLowerCase() === statusFilter.toLowerCase();
       
-      // Date range filter
       let matchesDate = true;
       if (dateRange !== "all") {
         const aptDate = new Date(apt.createdAt);
@@ -379,6 +449,43 @@ export default function AdminDashboard() {
       return 0;
     });
 
+  // Filter contacts
+  const filteredContacts = contacts
+    .filter(contact => {
+      const fullName = `${contact.firstName} ${contact.lastName}`.toLowerCase();
+      const email = contact.email.toLowerCase();
+      const subject = contact.subject.toLowerCase();
+      const searchTerm = search.toLowerCase();
+      
+      const matchesSearch = fullName.includes(searchTerm) || 
+                           email.includes(searchTerm) || 
+                           subject.includes(searchTerm);
+      
+      const matchesStatus = statusFilter === "all" || contact.status.toLowerCase() === statusFilter.toLowerCase();
+      
+      let matchesDate = true;
+      if (dateRange !== "all") {
+        const contactDate = new Date(contact.createdAt);
+        const now = new Date();
+        const diffTime = Math.abs(now.getTime() - contactDate.getTime());
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        
+        if (dateRange === "today" && diffDays > 0) matchesDate = false;
+        if (dateRange === "week" && diffDays > 7) matchesDate = false;
+        if (dateRange === "month" && diffDays > 30) matchesDate = false;
+      }
+      
+      return matchesSearch && matchesStatus && matchesDate;
+    })
+    .sort((a, b) => {
+      if (sortBy === "newest") {
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      } else if (sortBy === "oldest") {
+        return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+      }
+      return 0;
+    });
+
   const filteredUsers = users.filter(user => {
     const fullName = `${user.firstName} ${user.lastName}`.toLowerCase();
     const email = user.email.toLowerCase();
@@ -391,21 +498,37 @@ export default function AdminDashboard() {
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentAppointments = filteredAppointments.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(filteredAppointments.length / itemsPerPage);
+  const currentContacts = filteredContacts.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = activeTab === "appointments" 
+    ? Math.ceil(filteredAppointments.length / itemsPerPage)
+    : Math.ceil(filteredContacts.length / itemsPerPage);
 
   // Stats calculations
   const totalUsers = users.length;
   const totalAppointments = appointments.length;
+  const totalContacts = contacts.length;
   const pendingAppointments = appointments.filter(a => a.status === 'Pending').length;
   const progressAppointments = appointments.filter(a => a.status === 'Progress').length;
   const completedAppointments = appointments.filter(a => a.status === 'Completed').length;
   const rejectedAppointments = appointments.filter(a => a.status === 'Rejected').length;
+  
+  const pendingContacts = contacts.filter(c => c.status === 'Pending').length;
+  const progressContacts = contacts.filter(c => c.status === 'Progress').length;
+  const completedContacts = contacts.filter(c => c.status === 'Completed').length;
+  const rejectedContacts = contacts.filter(c => c.status === 'Rejected').length;
   
   const appointmentsByStatus = [
     { name: 'Pending', value: pendingAppointments, color: '#EAB308' },
     { name: 'Progress', value: progressAppointments, color: '#3B82F6' },
     { name: 'Completed', value: completedAppointments, color: '#22C55E' },
     { name: 'Rejected', value: rejectedAppointments, color: '#EF4444' },
+  ];
+
+  const contactsByStatus = [
+    { name: 'Pending', value: pendingContacts, color: '#EAB308' },
+    { name: 'Progress', value: progressContacts, color: '#3B82F6' },
+    { name: 'Completed', value: completedContacts, color: '#22C55E' },
+    { name: 'Rejected', value: rejectedContacts, color: '#EF4444' },
   ];
 
   const appointmentsByArea = appointments.reduce((acc: any, apt) => {
@@ -464,7 +587,6 @@ export default function AdminDashboard() {
                   <RefreshCw className="h-4 w-4 mr-2" />
                   Refresh
                 </Button>
-               
               </div>
             </div>
           </FadeIn>
@@ -517,17 +639,17 @@ export default function AdminDashboard() {
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between mb-4">
                     <div className="h-12 w-12 bg-yellow-500/20 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                      <Clock className="h-6 w-6 text-yellow-500" />
+                      <MessageSquare className="h-6 w-6 text-yellow-500" />
                     </div>
-                    <Badge variant="outline" className="bg-yellow-500/10 border-yellow-500/20">Pending</Badge>
+                    <Badge variant="outline" className="bg-yellow-500/10 border-yellow-500/20">Inquiries</Badge>
                   </div>
-                  <p className="text-3xl font-headline font-bold mb-1">{pendingAppointments}</p>
-                  <p className="text-xs text-muted-foreground uppercase tracking-wider">Awaiting Review</p>
+                  <p className="text-3xl font-headline font-bold mb-1">{totalContacts}</p>
+                  <p className="text-xs text-muted-foreground uppercase tracking-wider">Contact Forms</p>
                   <div className="mt-4 flex items-center gap-2">
                     <div className="h-2 flex-1 bg-yellow-500/20 rounded-full overflow-hidden">
                       <div className="h-full w-full bg-yellow-500 rounded-full animate-pulse" />
                     </div>
-                    <span className="text-xs font-bold text-yellow-500">{Math.round((pendingAppointments/totalAppointments)*100)}%</span>
+                    <span className="text-xs font-bold text-yellow-500">{pendingContacts} pending</span>
                   </div>
                 </CardContent>
               </Card>
@@ -543,12 +665,12 @@ export default function AdminDashboard() {
                     <Badge variant="outline" className="bg-blue-500/10 border-blue-500/20">Rate</Badge>
                   </div>
                   <p className="text-3xl font-headline font-bold mb-1">
-                    {Math.round((completedAppointments/totalAppointments)*100) || 0}%
+                    {Math.round(((completedAppointments + completedContacts) / (totalAppointments + totalContacts)) * 100) || 0}%
                   </p>
                   <p className="text-xs text-muted-foreground uppercase tracking-wider">Completion Rate</p>
                   <div className="mt-4 flex justify-between items-center text-xs">
-                    <span className="text-green-500">✓ {completedAppointments}</span>
-                    <span className="text-red-500">✗ {rejectedAppointments}</span>
+                    <span className="text-green-500">✓ {completedAppointments + completedContacts}</span>
+                    <span className="text-red-500">✗ {rejectedAppointments + rejectedContacts}</span>
                   </div>
                 </CardContent>
               </Card>
@@ -662,6 +784,10 @@ export default function AdminDashboard() {
                   <Calendar className="h-4 w-4 mr-2" />
                   Appointments ({filteredAppointments.length})
                 </TabsTrigger>
+                <TabsTrigger value="contacts" className="rounded-lg px-4 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground font-bold">
+                  <MessageSquare className="h-4 w-4 mr-2" />
+                  Contacts ({filteredContacts.length})
+                </TabsTrigger>
                 <TabsTrigger value="users" className="rounded-lg px-4 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground font-bold">
                   <Users className="h-4 w-4 mr-2" />
                   Clients ({filteredUsers.length})
@@ -700,7 +826,7 @@ export default function AdminDashboard() {
                 <div className="relative w-64">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input 
-                    placeholder="Search by name, service, email..." 
+                    placeholder="Search by name, email, subject..." 
                     className="pl-10 bg-background/50 border-white/10 rounded-full h-10 text-sm"
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
@@ -751,26 +877,26 @@ export default function AdminDashboard() {
                     <CardHeader>
                       <CardTitle className="text-lg font-headline font-bold flex items-center gap-2">
                         <Activity className="h-5 w-5 text-primary" />
-                        Recent Activity
+                        Recent Contacts
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-4">
-                        {appointments.slice(0, 5).map((apt, idx) => (
-                          <div key={apt._id} className="flex items-start gap-3 p-3 bg-muted/10 rounded-xl hover:bg-primary/5 transition-all cursor-pointer" onClick={() => {
-                            setSelectedAppointment(apt);
-                            setIsAppointmentModalOpen(true);
+                        {contacts.slice(0, 5).map((contact, idx) => (
+                          <div key={contact._id} className="flex items-start gap-3 p-3 bg-muted/10 rounded-xl hover:bg-primary/5 transition-all cursor-pointer" onClick={() => {
+                            setSelectedContact(contact);
+                            setIsContactModalOpen(true);
                           }}>
-                            <div className="mt-1">{getStatusIcon(apt.status)}</div>
+                            <div className="mt-1">{getStatusIcon(contact.status)}</div>
                             <div className="flex-1">
                               <p className="text-sm font-medium">
-                                {apt.firstName} {apt.lastName} - {apt.area}
+                                {contact.firstName} {contact.lastName} - {contact.subject}
                               </p>
                               <p className="text-xs text-muted-foreground mt-1">
-                                Created by: {apt.userId?.firstName} {apt.userId?.lastName}
+                                {contact.email}
                               </p>
                               <p className="text-xs text-muted-foreground">
-                                {formatRelativeTime(apt.createdAt)}
+                                {formatRelativeTime(contact.createdAt)}
                               </p>
                             </div>
                           </div>
@@ -806,9 +932,6 @@ export default function AdminDashboard() {
                 <div className="text-center py-24 bg-card/10 rounded-[2rem] border-2 border-dashed border-white/5">
                   <Calendar className="h-12 w-12 text-muted-foreground mx-auto mb-4 opacity-20" />
                   <p className="text-muted-foreground italic mb-4">No appointments found.</p>
-                  <Button asChild variant="outline" className="rounded-full">
-                    <a href="/services#appointment">Create New Appointment</a>
-                  </Button>
                 </div>
               ) : (
                 <>
@@ -881,7 +1004,7 @@ export default function AdminDashboard() {
                                     <DropdownMenuItem 
                                       onClick={(e) => {
                                         e.stopPropagation();
-                                        updateStatus(apt._id, 'Progress');
+                                        updateAppointmentStatus(apt._id, 'Progress');
                                       }}
                                       className="flex items-center gap-2 cursor-pointer"
                                     >
@@ -891,7 +1014,7 @@ export default function AdminDashboard() {
                                     <DropdownMenuItem 
                                       onClick={(e) => {
                                         e.stopPropagation();
-                                        updateStatus(apt._id, 'Completed');
+                                        updateAppointmentStatus(apt._id, 'Completed');
                                       }}
                                       className="flex items-center gap-2 cursor-pointer"
                                     >
@@ -901,7 +1024,7 @@ export default function AdminDashboard() {
                                     <DropdownMenuItem 
                                       onClick={(e) => {
                                         e.stopPropagation();
-                                        updateStatus(apt._id, 'Rejected');
+                                        updateAppointmentStatus(apt._id, 'Rejected');
                                       }}
                                       className="flex items-center gap-2 cursor-pointer text-red-500"
                                     >
@@ -930,10 +1053,202 @@ export default function AdminDashboard() {
                   </div>
 
                   {/* Pagination */}
-                  {totalPages > 1 && (
+                  {totalPages > 1 && activeTab === "appointments" && (
                     <div className="flex items-center justify-between mt-8">
                       <p className="text-sm text-muted-foreground">
                         Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, filteredAppointments.length)} of {filteredAppointments.length} appointments
+                      </p>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          className="rounded-full h-10 w-10 border-white/10"
+                          onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                          disabled={currentPage === 1}
+                        >
+                          <ChevronLeft className="h-4 w-4" />
+                        </Button>
+                        <span className="text-sm">
+                          Page {currentPage} of {totalPages}
+                        </span>
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          className="rounded-full h-10 w-10 border-white/10"
+                          onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                          disabled={currentPage === totalPages}
+                        >
+                          <ChevronRight className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </>
+              )}
+            </TabsContent>
+
+            {/* Contacts Tab */}
+            <TabsContent value="contacts" className="m-0">
+              {isLoading ? (
+                <div className="flex justify-center py-24">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                </div>
+              ) : filteredContacts.length === 0 ? (
+                <div className="text-center py-24 bg-card/10 rounded-[2rem] border-2 border-dashed border-white/5">
+                  <MessageSquare className="h-12 w-12 text-muted-foreground mx-auto mb-4 opacity-20" />
+                  <p className="text-muted-foreground italic mb-4">No contact inquiries found.</p>
+                </div>
+              ) : (
+                <>
+                  <div className="grid gap-4">
+                    {currentContacts.map((contact, idx) => (
+                      <FadeIn key={contact._id} delay={idx * 0.05}>
+                        <Card 
+                          className="bg-gradient-to-r from-card/30 to-card/10 border-white/5 hover:border-primary/30 hover:shadow-xl transition-all rounded-2xl overflow-hidden group cursor-pointer"
+                          onClick={() => {
+                            setSelectedContact(contact);
+                            setIsContactModalOpen(true);
+                          }}
+                        >
+                          <CardContent className="p-6">
+                            <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-6">
+                              <div className="flex items-start gap-4 flex-1">
+                                <div className="h-14 w-14 bg-gradient-to-br from-yellow-500 to-orange-500 rounded-xl flex items-center justify-center font-bold text-white text-lg shadow-lg">
+                                  {contact.firstName?.charAt(0)}{contact.lastName?.charAt(0)}
+                                </div>
+                                <div className="flex-1">
+                                  <div className="flex items-center gap-3 mb-2">
+                                    <p className="text-xs font-bold text-primary uppercase tracking-widest">
+                                      {contact._id.slice(-8).toUpperCase()}
+                                    </p>
+                                    <Badge variant="outline" className={getStatusColor(contact.status)}>
+                                      {getStatusIcon(contact.status)}
+                                      <span className="ml-1">{contact.status}</span>
+                                    </Badge>
+                                  </div>
+                                  
+                                  <h3 className="text-lg font-headline font-bold">
+                                    {contact.firstName} {contact.lastName}
+                                  </h3>
+                                  
+                                  <p className="text-sm font-medium text-primary mt-1">
+                                    {contact.subject}
+                                  </p>
+                                  
+                                  <p className="text-sm text-muted-foreground mt-2 line-clamp-2">
+                                    {contact.Inquiry}
+                                  </p>
+                                  
+                                  <div className="flex flex-wrap items-center gap-4 mt-3">
+                                    <div className="flex items-center gap-2 text-xs bg-muted/10 px-3 py-1.5 rounded-full">
+                                      <Mail className="h-3 w-3 text-primary" />
+                                      <span>{contact.email}</span>
+                                    </div>
+                                    <div className="flex items-center gap-2 text-xs bg-muted/10 px-3 py-1.5 rounded-full">
+                                      <Phone className="h-3 w-3 text-primary" />
+                                      <span>{contact.phone}</span>
+                                    </div>
+                                    <div className="flex items-center gap-2 text-xs bg-muted/10 px-3 py-1.5 rounded-full">
+                                      <Clock className="h-3 w-3 text-primary" />
+                                      <span>{formatRelativeTime(contact.createdAt)}</span>
+                                    </div>
+                                  </div>
+                                  
+                                  {contact.userId && (
+                                    <div className="flex items-center gap-2 text-xs bg-muted/10 p-2 rounded-lg inline-flex mt-3">
+                                      <UserIcon className="h-3 w-3 text-primary" />
+                                      <span className="text-muted-foreground">Submitted by:</span>
+                                      <span className="font-medium">
+                                        {contact.userId.firstName} {contact.userId.lastName}
+                                      </span>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+
+                              <div className="flex items-center gap-3 lg:self-center">
+                                {/* <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="rounded-full border-white/10 hover:bg-primary/10"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    window.location.href = `mailto:${contact.email}?subject=Re: ${contact.subject}`;
+                                  }}
+                                >
+                                  <Reply className="h-3 w-3 mr-2" />
+                                  Reply
+                                </Button>
+                                 */}
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                                    <Button variant="ghost" size="icon" className="rounded-full h-10 w-10 hover:bg-white/10">
+                                      {updatingStatus === contact._id ? (
+                                        <Loader2 className="h-4 w-4 animate-spin" />
+                                      ) : (
+                                        <MoreVertical className="h-4 w-4" />
+                                      )}
+                                    </Button>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent align="end" className="bg-card border-white/10 rounded-xl w-48">
+                                    <DropdownMenuLabel>Update Status</DropdownMenuLabel>
+                                    <DropdownMenuSeparator />
+                                    <DropdownMenuItem 
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        updateContactStatus(contact._id, 'Progress');
+                                      }}
+                                      className="flex items-center gap-2 cursor-pointer"
+                                    >
+                                      <Timer className="h-4 w-4 text-blue-500" />
+                                      In Progress
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem 
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        updateContactStatus(contact._id, 'Completed');
+                                      }}
+                                      className="flex items-center gap-2 cursor-pointer"
+                                    >
+                                      <CheckCircle2 className="h-4 w-4 text-green-500" />
+                                      Completed
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem 
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        updateContactStatus(contact._id, 'Rejected');
+                                      }}
+                                      className="flex items-center gap-2 cursor-pointer text-red-500"
+                                    >
+                                      <XCircle className="h-4 w-4" />
+                                      Rejected
+                                    </DropdownMenuItem>
+                                    <DropdownMenuSeparator />
+                                    <DropdownMenuItem 
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        window.location.href = `mailto:${contact.email}`;
+                                      }}
+                                      className="flex items-center gap-2 cursor-pointer"
+                                    >
+                                      <Mail className="h-4 w-4" />
+                                      Send Email
+                                    </DropdownMenuItem>
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </FadeIn>
+                    ))}
+                  </div>
+
+                  {/* Pagination */}
+                  {totalPages > 1 && activeTab === "contacts" && (
+                    <div className="flex items-center justify-between mt-8">
+                      <p className="text-sm text-muted-foreground">
+                        Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, filteredContacts.length)} of {filteredContacts.length} contacts
                       </p>
                       <div className="flex items-center gap-2">
                         <Button
@@ -979,6 +1294,7 @@ export default function AdminDashboard() {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {filteredUsers.map((user, i) => {
                     const userAppointments = appointments.filter(apt => apt.userId?._id === user._id);
+                    const userContacts = contacts.filter(contact => contact.userId?._id === user._id);
                     
                     return (
                       <FadeIn key={user._id} delay={i * 0.1}>
@@ -1014,6 +1330,10 @@ export default function AdminDashboard() {
                               <div className="flex items-center gap-3 text-sm p-3 bg-muted/10 rounded-xl">
                                 <Briefcase className="h-4 w-4 text-primary" />
                                 <span className="text-muted-foreground">{userAppointments.length} appointments</span>
+                              </div>
+                              <div className="flex items-center gap-3 text-sm p-3 bg-muted/10 rounded-xl">
+                                <MessageSquare className="h-4 w-4 text-primary" />
+                                <span className="text-muted-foreground">{userContacts.length} inquiries</span>
                               </div>
                             </div>
                             
@@ -1192,8 +1512,7 @@ export default function AdminDashboard() {
                     size="sm"
                     className="flex-1 rounded-full border-blue-500/20 hover:bg-blue-500/10"
                     onClick={() => {
-                      updateStatus(selectedAppointment._id, 'Progress');
-                      setIsAppointmentModalOpen(false);
+                      updateAppointmentStatus(selectedAppointment._id, 'Progress');
                     }}
                   >
                     <Timer className="h-4 w-4 mr-2 text-blue-500" />
@@ -1204,8 +1523,7 @@ export default function AdminDashboard() {
                     size="sm"
                     className="flex-1 rounded-full border-green-500/20 hover:bg-green-500/10"
                     onClick={() => {
-                      updateStatus(selectedAppointment._id, 'Completed');
-                      setIsAppointmentModalOpen(false);
+                      updateAppointmentStatus(selectedAppointment._id, 'Completed');
                     }}
                   >
                     <CheckCircle2 className="h-4 w-4 mr-2 text-green-500" />
@@ -1216,8 +1534,7 @@ export default function AdminDashboard() {
                     size="sm"
                     className="flex-1 rounded-full border-red-500/20 hover:bg-red-500/10"
                     onClick={() => {
-                      updateStatus(selectedAppointment._id, 'Rejected');
-                      setIsAppointmentModalOpen(false);
+                      updateAppointmentStatus(selectedAppointment._id, 'Rejected');
                     }}
                   >
                     <XCircle className="h-4 w-4 mr-2 text-red-500" />
@@ -1240,6 +1557,183 @@ export default function AdminDashboard() {
                 </Button>
                 <Button
                   onClick={() => setIsAppointmentModalOpen(false)}
+                  className="rounded-full bg-primary hover:bg-primary/90"
+                >
+                  Close
+                </Button>
+              </DialogFooter>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Contact Details Modal */}
+      <Dialog open={isContactModalOpen} onOpenChange={setIsContactModalOpen}>
+        <DialogContent className="bg-gradient-to-br from-background via-background to-primary/5 border-white/10 max-w-3xl max-h-[90vh] overflow-y-auto rounded-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-headline font-bold flex items-center gap-2">
+              <div className="h-10 w-10 bg-yellow-500/20 rounded-xl flex items-center justify-center">
+                <MessageSquare className="h-5 w-5 text-yellow-500" />
+              </div>
+              Contact Inquiry Details
+            </DialogTitle>
+            <DialogDescription>
+              Full information about the contact inquiry
+            </DialogDescription>
+          </DialogHeader>
+          
+          {selectedContact && (
+            <div className="space-y-6 py-4">
+              {/* Header with Status */}
+              <div className="flex justify-between items-center p-4 bg-muted/10 rounded-xl">
+                <div className="flex items-center gap-3">
+                  {getStatusIcon(selectedContact.status)}
+                  <div>
+                    <p className="text-xs text-muted-foreground">Current Status</p>
+                    <Badge variant="outline" className={getStatusColor(selectedContact.status)}>
+                      {selectedContact.status}
+                    </Badge>
+                  </div>
+                </div>
+                <p className="text-xs text-muted-foreground font-mono">
+                  ID: {selectedContact._id}
+                </p>
+              </div>
+
+              {/* Contact Information */}
+              <div className="space-y-3">
+                <h3 className="text-sm font-bold uppercase tracking-widest text-primary flex items-center gap-2">
+                  <UserIcon className="h-4 w-4" />
+                  Contact Information
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-muted/10 rounded-xl p-4">
+                  <div>
+                    <p className="text-[10px] uppercase text-muted-foreground mb-1">Full Name</p>
+                    <p className="font-medium text-lg">{selectedContact.firstName} {selectedContact.lastName}</p>
+                  </div>
+                  <div>
+                    <p className="text-[10px] uppercase text-muted-foreground mb-1">Email</p>
+                    <p className="font-medium flex items-center gap-2">
+                      <Mail className="h-3 w-3 text-primary" /> {selectedContact.email}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-[10px] uppercase text-muted-foreground mb-1">Phone</p>
+                    <p className="font-medium flex items-center gap-2">
+                      <Phone className="h-3 w-3 text-primary" /> {selectedContact.phone}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-[10px] uppercase text-muted-foreground mb-1">Submitted On</p>
+                    <p className="font-medium flex items-center gap-2">
+                      <Clock className="h-3 w-3 text-primary" /> {formatDateTime(selectedContact.createdAt)}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Subject */}
+              <div className="space-y-3">
+                <h3 className="text-sm font-bold uppercase tracking-widest text-primary flex items-center gap-2">
+                  <FileText className="h-4 w-4" />
+                  Subject
+                </h3>
+                <div className="bg-muted/10 rounded-xl p-4">
+                  <p className="font-medium">{selectedContact.subject}</p>
+                </div>
+              </div>
+
+              {/* Inquiry */}
+              <div className="space-y-3">
+                <h3 className="text-sm font-bold uppercase tracking-widest text-primary flex items-center gap-2">
+                  <MessageSquare className="h-4 w-4" />
+                  Inquiry Details
+                </h3>
+                <div className="bg-muted/10 rounded-xl p-4">
+                  <p className="text-sm whitespace-pre-wrap leading-relaxed">{selectedContact.Inquiry}</p>
+                </div>
+              </div>
+
+              {/* User Information (if logged in) */}
+              {selectedContact.userId && (
+                <div className="space-y-3">
+                  <h3 className="text-sm font-bold uppercase tracking-widest text-primary flex items-center gap-2">
+                    <Users className="h-4 w-4" />
+                    Submitted By (Registered User)
+                  </h3>
+                  <div className="bg-muted/10 rounded-xl p-4">
+                    <div className="flex items-center gap-4">
+                      <div className="h-12 w-12 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center text-white font-bold">
+                        {selectedContact.userId.firstName?.charAt(0)}{selectedContact.userId.lastName?.charAt(0)}
+                      </div>
+                      <div>
+                        <p className="font-medium">{selectedContact.userId.firstName} {selectedContact.userId.lastName}</p>
+                        <p className="text-sm text-muted-foreground flex items-center gap-2 mt-1">
+                          <Mail className="h-3 w-3" /> {selectedContact.userId.email}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Status Update */}
+              <div className="space-y-3">
+                <h3 className="text-sm font-bold uppercase tracking-widest text-primary flex items-center gap-2">
+                  <Activity className="h-4 w-4" />
+                  Update Status
+                </h3>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex-1 rounded-full border-blue-500/20 hover:bg-blue-500/10"
+                    onClick={() => {
+                      updateContactStatus(selectedContact._id, 'Progress');
+                    }}
+                  >
+                    <Timer className="h-4 w-4 mr-2 text-blue-500" />
+                    In Progress
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex-1 rounded-full border-green-500/20 hover:bg-green-500/10"
+                    onClick={() => {
+                      updateContactStatus(selectedContact._id, 'Completed');
+                    }}
+                  >
+                    <CheckCircle2 className="h-4 w-4 mr-2 text-green-500" />
+                    Completed
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex-1 rounded-full border-red-500/20 hover:bg-red-500/10"
+                    onClick={() => {
+                      updateContactStatus(selectedContact._id, 'Rejected');
+                    }}
+                  >
+                    <XCircle className="h-4 w-4 mr-2 text-red-500" />
+                    Rejected
+                  </Button>
+                </div>
+              </div>
+
+              {/* Actions */}
+              <DialogFooter className="flex gap-3 pt-4">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    window.location.href = `mailto:${selectedContact.email}?subject=Re: ${selectedContact.subject}`;
+                  }}
+                  className="rounded-full"
+                >
+                  <Reply className="h-4 w-4 mr-2" />
+                  Reply via Email
+                </Button>
+                <Button
+                  onClick={() => setIsContactModalOpen(false)}
                   className="rounded-full bg-primary hover:bg-primary/90"
                 >
                   Close
@@ -1333,6 +1827,39 @@ export default function AdminDashboard() {
                     ))}
                   {appointments.filter(apt => apt.userId?._id === selectedUser._id).length === 0 && (
                     <p className="text-sm text-muted-foreground italic p-4 text-center">No appointments found</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Client Contacts */}
+              <div className="space-y-3">
+                <h3 className="text-sm font-bold uppercase tracking-widest text-primary flex items-center gap-2">
+                  <MessageSquare className="h-4 w-4" />
+                  Contact Inquiries ({contacts.filter(contact => contact.userId?._id === selectedUser._id).length})
+                </h3>
+                <div className="max-h-48 overflow-y-auto space-y-2 pr-2">
+                  {contacts
+                    .filter(contact => contact.userId?._id === selectedUser._id)
+                    .map(contact => (
+                      <div key={contact._id} 
+                        className="bg-muted/5 rounded-xl p-3 flex justify-between items-center hover:bg-primary/5 transition-all cursor-pointer"
+                        onClick={() => {
+                          setSelectedContact(contact);
+                          setIsContactModalOpen(true);
+                          setIsUserModalOpen(false);
+                        }}
+                      >
+                        <div>
+                          <p className="text-sm font-medium">{contact.subject}</p>
+                          <p className="text-xs text-muted-foreground mt-1">{formatRelativeTime(contact.createdAt)}</p>
+                        </div>
+                        <Badge variant="outline" className={getStatusColor(contact.status)}>
+                          {contact.status}
+                        </Badge>
+                      </div>
+                    ))}
+                  {contacts.filter(contact => contact.userId?._id === selectedUser._id).length === 0 && (
+                    <p className="text-sm text-muted-foreground italic p-4 text-center">No contact inquiries found</p>
                   )}
                 </div>
               </div>

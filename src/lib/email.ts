@@ -138,3 +138,124 @@ export async function sendNewAppointmentNotificationToAdmins(
   
   return sendEmail(adminEmails, subject, html)
 }
+
+
+export async function sendContactCreatedEmail(
+  userEmail: string,
+  userName: string,
+  contactDetails: {
+    firstName: string
+    lastName: string
+    email: string
+    phone: string
+    subject: string
+    Inquiry: string
+  }
+) {
+  const subject = "Contact Request Submitted Successfully"
+
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+      <h2 style="color: #333;">Contact Request Submitted</h2>
+      <p>Dear ${userName},</p>
+      <p>Your contact request has been submitted successfully. Here are the details:</p>
+
+      <div style="background-color: #f5f5f5; padding: 15px; border-radius: 5px; margin: 20px 0;">
+        <p><strong>Name:</strong> ${contactDetails.firstName} ${contactDetails.lastName}</p>
+        <p><strong>Email:</strong> ${contactDetails.email}</p>
+        <p><strong>Phone:</strong> ${contactDetails.phone}</p>
+        <p><strong>Subject:</strong> ${contactDetails.subject}</p>
+        <p><strong>Inquiry:</strong> ${contactDetails.Inquiry}</p>
+      </div>
+
+      <p>Your request status is <strong>Pending</strong>. Our team will contact you shortly.</p>
+      <p>Best regards,<br/>MAFHH Legal Team</p>
+    </div>
+  `
+
+  return sendEmail(userEmail, subject, html)
+}
+
+export async function sendContactStatusUpdateEmail(
+  userEmail: string,
+  userName: string,
+  status: string,
+  contactDetails: {
+    firstName: string
+    lastName: string
+    email: string
+    phone: string
+    subject: string
+    Inquiry: string
+  }
+) {
+  const subjectLine = `Contact Request Status Updated - ${status}`
+
+  const statusColor =
+    status === "Completed" ? "green" : status === "Rejected" ? "red" : "orange"
+
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+      <h2 style="color: #333;">Contact Request Status Updated</h2>
+
+      <p>Dear ${userName},</p>
+      <p>Your contact request status has been updated. Please see the details below:</p>
+
+      <div style="background-color: #f5f5f5; padding: 15px; border-radius: 5px; margin: 20px 0;">
+        <p><strong>Name:</strong> ${contactDetails.firstName} ${contactDetails.lastName}</p>
+        <p><strong>Email:</strong> ${contactDetails.email}</p>
+        <p><strong>Phone:</strong> ${contactDetails.phone}</p>
+        <p><strong>Subject:</strong> ${contactDetails.subject}</p>
+        <p><strong>Inquiry:</strong> ${contactDetails.Inquiry}</p>
+        <p>
+          <strong>Status:</strong>
+          <span style="color:${statusColor}; font-weight:bold;">${status}</span>
+        </p>
+      </div>
+
+      <p>If you have any further questions, feel free to reply to this email.</p>
+      <p>Best regards,<br/>MAFHH Legal Team</p>
+    </div>
+  `
+
+  return sendEmail(userEmail, subjectLine, html)
+}
+
+
+export async function sendNewContactNotificationToAdmins(
+  adminEmails: string[],
+  contactDetails: {
+    firstName: string
+    lastName: string
+    email: string
+    phone: string
+    subject: string
+    Inquiry: string
+    createdAt: string
+  }
+) {
+  const subject = "New Contact Request Received"
+
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+      <h2 style="color: #333;">New Contact Request</h2>
+
+      <p>Dear Admin,</p>
+      <p>A new contact request has been submitted. Details are below:</p>
+
+      <div style="background-color: #f5f5f5; padding: 15px; border-radius: 5px; margin: 20px 0;">
+        <p><strong>Name:</strong> ${contactDetails.firstName} ${contactDetails.lastName}</p>
+        <p><strong>Email:</strong> ${contactDetails.email}</p>
+        <p><strong>Phone:</strong> ${contactDetails.phone}</p>
+        <p><strong>Subject:</strong> ${contactDetails.subject}</p>
+        <p><strong>Inquiry:</strong> ${contactDetails.Inquiry}</p>
+        <p><strong>Created At:</strong> ${contactDetails.createdAt}</p>
+      </div>
+
+      <p>Please log in to the admin panel to review and respond.</p>
+      <p>Best regards,<br/>MAFHH Legal System</p>
+    </div>
+  `
+
+  return sendEmail(adminEmails, subject, html)
+}

@@ -12,7 +12,8 @@ import {
   ChevronRight,
   Plus,
   AlertCircle,
-  Loader2
+  Loader2,
+  MessageSquare
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -22,6 +23,7 @@ import { Footer } from "@/components/Footer";
 import { FadeIn } from "@/components/FadeIn";
 import Link from "next/link";
 import axios from "axios";
+import { ContactsModal } from "@/components/ContactsModal";
 
 interface Appointment {
   _id: string;
@@ -45,6 +47,7 @@ export default function DashboardPage() {
   const [mounted, setMounted] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [contactsModalOpen, setContactsModalOpen] = useState(false);
 
   // Check authentication
   useEffect(() => {
@@ -146,11 +149,18 @@ export default function DashboardPage() {
                 <h1 className="text-3xl md:text-4xl font-headline font-bold mb-2">Welcome, {user.name}</h1>
                 <p className="text-muted-foreground">Manage your legal matters and upcoming consultations.</p>
               </div>
-              <Button asChild className="rounded-full h-12 px-8 font-bold shadow-lg shadow-primary/20">
-                <Link href="/services#appointment">
-                  <Plus className="mr-2 h-4 w-4" /> New Consultation
-                </Link>
-              </Button>
+              <div className="flex gap-3">
+                <ContactsModal open={contactsModalOpen} onOpenChange={setContactsModalOpen}>
+                  <Button variant="outline" className="rounded-full h-12 px-6 font-bold">
+                    <MessageSquare className="mr-2 h-4 w-4" /> View Contacts
+                  </Button>
+                </ContactsModal>
+                <Button asChild className="rounded-full h-12 px-8 font-bold shadow-lg shadow-primary/20">
+                  <Link href="/services#appointment">
+                    <Plus className="mr-2 h-4 w-4" /> New Consultation
+                  </Link>
+                </Button>
+              </div>
             </div>
           </FadeIn>
 
